@@ -1,0 +1,19 @@
+<Solution>
+
+  <Folder Name="/lib/" />
+  <Folder Name="/lib/LiveSplit/">
+    <Project Path="lib/LiveSplit/src/LiveSplit.Core/LiveSplit.Core.csproj" />
+    <Project Path="lib/LiveSplit/src/UpdateManager/UpdateManager.csproj" />
+  </Folder>
+
+  <Folder Name="/misc/">
+    <File Path=".gitignore" />
+    <File Path="Components/update.LiveSplit.SampleSplitter.xml" />
+    <File Path="Directory.Build.props" />
+  </Folder>
+
+  <Folder Name="/src/">
+    <Project Path="src/LiveSplit.SampleSplitter/LiveSplit.SampleSplitter.csproj" />
+  </Folder>
+
+</Solution>
