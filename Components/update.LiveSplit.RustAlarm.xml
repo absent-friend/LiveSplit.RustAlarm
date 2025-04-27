@@ -1,11 +1,11 @@
 <updates>
 
-  <!-- Applied only when `version` is greater than `SampleSplitterFactory.Version`. -->
+  <!-- Applied only when `version` is greater than `RustAlarmFactory.Version`. -->
   <update version="0.0.0">
     <files>
-      <!-- Path to the updated file relative to `SampleSplitterFactory.UpdateURL`. -->
+      <!-- Path to the updated file relative to `RustAlarmFactory.UpdateURL`. -->
       <!-- Possible values for `status` are: `added`, `changed`, `removed`. -->
-      <file path="Components/LiveSplit.SampleSplitter.dll" status="changed"/>
+      <file path="Components/LiveSplit.RustAlarm.dll" status="changed"/>
     </files>
 
     <!-- Bullet point list of changes in this update. -->

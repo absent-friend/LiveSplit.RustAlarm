@@ -1,4 +1,8 @@
-# LiveSplit.SampleSplitter
+# LiveSplit.RustAlarm
+
+## Environment Setup
+
+When you clone the repository, be sure to use the `--recurse-submodules` option. This will init the LiveSplit submodule (and all of its nested submodules) in addition to the main repository.
 
 ## Building
 

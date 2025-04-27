@@ -1,6 +1,6 @@
-﻿namespace LiveSplit.SampleSplitter.UI;
+﻿namespace LiveSplit.RustAlarm.UI;
 
-partial class SampleSplitterSettings
+partial class RustAlarmSettings
 {
     /// <summary> 
     /// Required designer variable.

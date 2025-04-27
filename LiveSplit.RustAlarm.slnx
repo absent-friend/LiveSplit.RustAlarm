@@ -8,12 +8,18 @@
 
   <Folder Name="/misc/">
     <File Path=".gitignore" />
-    <File Path="Components/update.LiveSplit.SampleSplitter.xml" />
+    <File Path="Components/update.LiveSplit.RustAlarm.xml" />
     <File Path="Directory.Build.props" />
   </Folder>
 
   <Folder Name="/src/">
-    <Project Path="src/LiveSplit.SampleSplitter/LiveSplit.SampleSplitter.csproj" />
+    <Project Path="src/LiveSplit.RustAlarm/LiveSplit.RustAlarm.csproj" />
   </Folder>
+
+  <Properties Name="Visual Studio">
+
+    <Property Name="OpenWith" Value="17" />
+
+  </Properties>
 
 </Solution>

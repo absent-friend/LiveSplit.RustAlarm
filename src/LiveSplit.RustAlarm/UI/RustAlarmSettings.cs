@@ -4,11 +4,11 @@ using System.Windows.Forms;
 using System.Xml;
 using LiveSplit.UI;
 
-namespace LiveSplit.SampleSplitter.UI;
+namespace LiveSplit.RustAlarm.UI;
 
-public partial class SampleSplitterSettings : UserControl
+public partial class RustAlarmSettings : UserControl
 {
-    public SampleSplitterSettings()
+    public RustAlarmSettings()
     {
         InitializeComponent();
 
