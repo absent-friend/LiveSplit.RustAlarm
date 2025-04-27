@@ -9,7 +9,7 @@ using LiveSplit.RustAlarm.UI;
 using LiveSplit.UI;
 using LiveSplit.UI.Components;
 
-namespace LiveSplit.SampleSplitter;
+namespace LiveSplit.RustAlarm;
 
 public sealed class RustAlarmComponent : IComponent
 {

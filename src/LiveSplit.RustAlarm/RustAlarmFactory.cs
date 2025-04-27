@@ -1,13 +1,11 @@
-#warning TODO: Adjust this information to match your component.
-
 using System;
 
 using LiveSplit.Model;
 using LiveSplit.UI.Components;
 
-[assembly: ComponentFactory(typeof(LiveSplit.SampleSplitter.RustAlarmFactory))]
+[assembly: ComponentFactory(typeof(LiveSplit.RustAlarm.RustAlarmFactory))]
 
-namespace LiveSplit.SampleSplitter;
+namespace LiveSplit.RustAlarm;
 
 public sealed class RustAlarmFactory : IComponentFactory
 {
