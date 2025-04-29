@@ -1,4 +1,4 @@
-﻿#warning TODO: Adjust this information to match your component.
+﻿#warning TODO: Allow configuration of thresholds, font + text color overrides
 
 using System.Windows.Forms;
 using System.Xml;
