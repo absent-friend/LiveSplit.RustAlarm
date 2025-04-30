@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -17,56 +17,57 @@ public sealed class RustAlarmComponent : IComponent
     public const string Name = "Rust Alarm";
 
     private readonly LiveSplitState _state;
+    private IRun _currentRun;
     private readonly RustAlarmSettings _settings;
-    private List<RustAlarmSegment> _segments;
+    private readonly ComponentRendererComponent _componentRenderer;
     private readonly InfoTextComponent _heading;
-    private readonly ComponentRendererComponent _internalComponent;
+    private List<RustAlarmSegment> _segments;
     private int _skipStart;
     private int _segmentIndex;
+    private int _rustCount;
 
     public RustAlarmComponent(LiveSplitState state)
     {
         _state = state;
+        _currentRun = state.Run;
         _settings = new();
-        _segments = BuildSegments();
-        _heading = new("Rusty Segments", "");
-        _heading.NameLabel.HorizontalAlignment = StringAlignment.Center;
-        _internalComponent = new()
-        {
-            VisibleComponents = _segments
-                .Where(segment => segment.IsRusty())
-                .Select(segment => segment.infoText)
-                .Prepend(_heading)
-        };
-
+        _componentRenderer = new();
+        _heading = new("Rusty Segments", "-");
+        BuildSegments();
         SetUpEventListeners();
     }
 
     public string ComponentName => Name;
 
-    public float HorizontalWidth => _internalComponent.HorizontalWidth;
+    public float HorizontalWidth => _componentRenderer.HorizontalWidth;
 
-    public float MinimumHeight => _internalComponent.MinimumHeight;
+    public float MinimumHeight => _componentRenderer.MinimumHeight;
 
-    public float VerticalHeight => _internalComponent.VerticalHeight;
+    public float VerticalHeight => _componentRenderer.VerticalHeight;
 
-    public float MinimumWidth => _internalComponent.MinimumWidth;
+    public float MinimumWidth => _componentRenderer.MinimumWidth;
 
-    public float PaddingTop => _internalComponent.PaddingTop;
+    public float PaddingTop => _componentRenderer.PaddingTop;
 
-    public float PaddingBottom => _internalComponent.PaddingBottom;
+    public float PaddingBottom => _componentRenderer.PaddingBottom;
 
-    public float PaddingLeft => _internalComponent.PaddingLeft;
+    public float PaddingLeft => _componentRenderer.PaddingLeft;
 
-    public float PaddingRight => _internalComponent.PaddingRight;
+    public float PaddingRight => _componentRenderer.PaddingRight;
 
     public IDictionary<string, Action> ContextMenuControls => null;
 
     public void Update(IInvalidator invalidator, LiveSplitState state, float width, float height, LayoutMode mode)
     {
+        if (_currentRun != state.Run)
+        {
+            _currentRun = state.Run;
+            BuildSegments();
+        }
+
         if (invalidator != null)
         {
-            _internalComponent.Update(invalidator, state, width, height, mode);
+            _componentRenderer.Update(invalidator, state, width, height, mode);
         }
     }
 
@@ -86,8 +87,9 @@ public sealed class RustAlarmComponent : IComponent
     }
 
     private void PrepareDraw(LiveSplitState state)
-    {
+    {        
         _heading.NameLabel.ForeColor = state.LayoutSettings.TextColor;
+        _heading.ValueLabel.ForeColor = state.LayoutSettings.TextColor;
         foreach (RustAlarmSegment segment in _segments)
         {
             segment.infoText.NameLabel.ForeColor = state.LayoutSettings.TextColor;
@@ -97,13 +99,13 @@ public sealed class RustAlarmComponent : IComponent
     public void DrawHorizontal(Graphics g, LiveSplitState state, float height, Region clipRegion)
     {
         PrepareDraw(state);
-        _internalComponent.DrawHorizontal(g, state, height, clipRegion);
+        _componentRenderer.DrawHorizontal(g, state, height, clipRegion);
     }
 
     public void DrawVertical(Graphics g, LiveSplitState state, float width, Region clipRegion)
     {
         PrepareDraw(state);
-        _internalComponent.DrawVertical(g, state, width, clipRegion);
+        _componentRenderer.DrawVertical(g, state, width, clipRegion);
     }
 
     // Dispose is called when the component is removed from the layout or when the application is closed.
@@ -128,7 +130,13 @@ public sealed class RustAlarmComponent : IComponent
     {
         if (value != TimerPhase.Ended)
         {
+            bool wasClean = !_segments[_segmentIndex].IsRusty();
             _segments[_segmentIndex].rustCounter++;
+            if (wasClean && _segments[_segmentIndex].IsRusty())
+            {
+                _rustCount++;
+                _heading.ValueLabel.Text = _rustCount.ToString();
+            }
         }
         _segmentIndex = 0;
         _skipStart = 0;
@@ -143,21 +151,33 @@ public sealed class RustAlarmComponent : IComponent
     {
         for (int i = _skipStart; i <= _segmentIndex; i++)
         {
+            bool wasRusty = _segments[i].IsRusty();
             _segments[i].rustCounter = 0;
+            if (wasRusty)
+            {
+                _rustCount--;
+            }
         }
+        _heading.ValueLabel.Text = _rustCount == 0 ? "-" : _rustCount.ToString();
         _segmentIndex++;
         _skipStart = _segmentIndex;
     }
 
     private void _state_RunManuallyModified(object sender, EventArgs e)
     {
-        _segments = BuildSegments();
+        BuildSegments();
     }
 
-    private List<RustAlarmSegment> BuildSegments()
+    private void BuildSegments()
     {
-        return _state.Run
+        _segments = _state.Run
             .Select((ISegment segment) => new RustAlarmSegment(segment.Name))
             .ToList();
+        _componentRenderer.VisibleComponents = _segments
+            .Where(segment => segment.IsRusty())
+            .Select(segment => segment.infoText)
+            .Prepend(_heading);
+        _rustCount = 0;
+        _heading.ValueLabel.Text = "-";
     }
 }
