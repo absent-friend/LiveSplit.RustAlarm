@@ -87,13 +87,15 @@ public sealed class RustAlarmComponent : IComponent
     }
 
     private void PrepareDraw(LiveSplitState state)
-    {        
+    {
+        _heading.NameLabel.Font = state.LayoutSettings.TextFont;
         _heading.NameLabel.ForeColor = state.LayoutSettings.TextColor;
+        _heading.NameLabel.OutlineColor = state.LayoutSettings.TextOutlineColor;
+        _heading.NameLabel.ShadowColor = state.LayoutSettings.ShadowsColor;
+        _heading.ValueLabel.Font = state.LayoutSettings.TextFont;
         _heading.ValueLabel.ForeColor = state.LayoutSettings.TextColor;
-        foreach (RustAlarmSegment segment in _segments)
-        {
-            segment.infoText.NameLabel.ForeColor = state.LayoutSettings.TextColor;
-        }
+        _heading.ValueLabel.OutlineColor = state.LayoutSettings.TextOutlineColor;
+        _heading.ValueLabel.ShadowColor = state.LayoutSettings.ShadowsColor;
     }
 
     public void DrawHorizontal(Graphics g, LiveSplitState state, float height, Region clipRegion)
@@ -175,7 +177,7 @@ public sealed class RustAlarmComponent : IComponent
             .ToList();
         _componentRenderer.VisibleComponents = _segments
             .Where(segment => segment.IsRusty())
-            .Select(segment => segment.infoText)
+            .Cast<IComponent>()
             .Prepend(_heading);
         _rustCount = 0;
         _heading.ValueLabel.Text = "-";
