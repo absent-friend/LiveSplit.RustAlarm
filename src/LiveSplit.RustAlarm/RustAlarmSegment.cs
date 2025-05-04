@@ -16,47 +16,69 @@ namespace LiveSplit.RustAlarm
 
         private static readonly Brush WARNING_COLOR = new SolidBrush(Color.Yellow);
 
-        internal int rustCounter;
-        internal int rustThreshold;
+        private int _resetCounter;
+        private int _resetThreshold;
+        private bool _forceDraw;
         private readonly SimpleLabel _nameLabel;
         private readonly GraphicsCache _cache;
 
-        public float HorizontalWidth { get; set; }
-
-        public float MinimumHeight { get; set; }
-
-        public float VerticalHeight { get; set; }
+        internal ISegment Segment { get; set; }
 
         public float MinimumWidth => 20f;
 
-        public float PaddingTop { get; set; }
+        public float HorizontalWidth { get; private set; }
 
-        public float PaddingBottom { get; set; }
+        public float MinimumHeight { get; private set; }
+
+        public float VerticalHeight { get; private set; }
+
+        public float PaddingTop { get; private set; }
+
+        public float PaddingBottom { get; private set; }
 
         public float PaddingLeft => 7f;
 
         public float PaddingRight => 7f;
 
-        internal bool DisplayTwoRows => false;
-
-        public IDictionary<string, Action> ContextMenuControls => null;
-
-        internal RustAlarmSegment(string segmentName)
+        internal RustAlarmSegment(ISegment segment)
         {
-            rustCounter = 0;
-            rustThreshold = 3;
-            _nameLabel = new(segmentName);
+            _resetCounter = 0;
+            _resetThreshold = 3;
+            _forceDraw = false;
+            Segment = segment;
+            _nameLabel = new(segment.Name);
             _cache = new();
             MinimumHeight = 25;
         }
 
+        internal (bool, bool) AddReset()
+        {
+            bool wasClean = !IsRusty();
+            _resetCounter++;
+            bool isRusty = IsRusty();
+            if (wasClean && isRusty)
+            {
+                _forceDraw = true;
+            }
+            return (wasClean, isRusty);
+        }
+
+        internal (bool, bool) Split()
+        {
+            bool wasRusty = IsRusty();
+            _resetCounter = 0;
+            bool isClean = !IsRusty();
+            return (wasRusty, isClean);
+        }
+
         internal bool IsRusty()
         {
-            return rustCounter >= rustThreshold;
+            return _resetCounter >= _resetThreshold;
         }
 
         private void PrepareDraw(LiveSplitState state, LayoutMode mode)
         {
+            _nameLabel.Text = Segment.Name;
             _nameLabel.Font = state.LayoutSettings.TextFont;
             _nameLabel.ForeColor = state.LayoutSettings.TextColor;
             _nameLabel.OutlineColor = state.LayoutSettings.TextOutlineColor;
@@ -110,10 +132,11 @@ namespace LiveSplit.RustAlarm
         public void Update(IInvalidator invalidator, LiveSplitState state, float width, float height, LayoutMode mode)
         {
             _cache.Restart();
-            _cache["NameText"] = _nameLabel.Text;
-            if (invalidator != null && _cache.HasChanged)
+            _cache["NameText"] = Segment.Name;
+            if (invalidator != null && (_cache.HasChanged || _forceDraw))
             {
                 invalidator.Invalidate(0, 0, width, height);
+                _forceDraw = false;
             }
         }
 
@@ -123,6 +146,8 @@ namespace LiveSplit.RustAlarm
         }
 
         public string ComponentName => throw new NotSupportedException();
+
+        public IDictionary<string, Action> ContextMenuControls => null;
 
         public Control GetSettingsControl(LayoutMode mode)
         {

@@ -132,12 +132,12 @@ public sealed class RustAlarmComponent : IComponent
     {
         if (value != TimerPhase.Ended)
         {
-            bool wasClean = !_segments[_segmentIndex].IsRusty();
-            _segments[_segmentIndex].rustCounter++;
-            if (wasClean && _segments[_segmentIndex].IsRusty())
+            RustAlarmSegment segment = _segments[_segmentIndex];
+            (bool wasClean, bool isRusty) = segment.AddReset();
+            if (wasClean && isRusty)
             {
                 _rustCount++;
-                _heading.ValueLabel.Text = _rustCount.ToString();
+                SetHeadingText();
             }
         }
         _segmentIndex = 0;
@@ -153,33 +153,97 @@ public sealed class RustAlarmComponent : IComponent
     {
         for (int i = _skipStart; i <= _segmentIndex; i++)
         {
-            bool wasRusty = _segments[i].IsRusty();
-            _segments[i].rustCounter = 0;
-            if (wasRusty)
+            RustAlarmSegment segment = _segments[i];
+            (bool wasRusty, bool isClean) = segment.Split();
+            if (wasRusty && isClean)
             {
                 _rustCount--;
             }
         }
-        _heading.ValueLabel.Text = _rustCount == 0 ? "-" : _rustCount.ToString();
+        SetHeadingText();
         _segmentIndex++;
         _skipStart = _segmentIndex;
     }
 
+    private void SetHeadingText()
+    {
+        _heading.ValueLabel.Text = _rustCount == 0 ? "-" : _rustCount.ToString();
+    }
+
     private void _state_RunManuallyModified(object sender, EventArgs e)
     {
-        BuildSegments();
+        if (_state.Run != _currentRun)
+        {
+            // User opened the splits editor and then cancelled.
+            //
+            // We have no way of unwinding the changes that might have been made up to this point,
+            // since there's no way to see from here when the user clicks OK on the editing form.
+            //
+            // We have to wipe it clean and rebuild.
+            _currentRun = _state.Run;
+            BuildSegments();
+        }
+        else
+        {
+            FixSegments();
+        }
+    }
+
+    private void FixSegments()
+    {
+        // When a segment is moved, the other segment that it swaps with is removed and added back in at its new location.
+        // The current procedure will register this as a split being deleted and a new (unrelated) split being added.
+        // We'll have to track segment-level settings outside RustAlarmSegment, or they'll be partly destroyed by a move.
+        int i = 0;
+        for (; i < _state.Run.Count && i < _segments.Count; i++)
+        {
+            ISegment segment = _state.Run[i];
+            if (_state.Run[i] == _segments[i].Segment)
+                continue;
+            int newIndex = _segments.FindIndex(s => s.Segment == segment);
+            if (newIndex == -1)
+            {
+                _segments.Insert(i, new RustAlarmSegment(segment));
+            }
+            else
+            {
+                (_segments[newIndex], _segments[i]) = (_segments[i], _segments[newIndex]);
+            }
+        }
+
+        if (i < _state.Run.Count)
+        {
+            for (; i < _state.Run.Count; i++)
+            {
+                _segments.Add(new RustAlarmSegment(_state.Run[i]));
+            }
+        }
+        else if (i < _segments.Count)
+        {
+            // Everything that corresponds to a segment currently contained in the run should have been swapped or inserted into its correct place at an index < i.
+            // Leftover segments were deleted in the splits editor.
+            for (int j = i; j < _segments.Count; j++)
+            {
+                if (_segments[j].IsRusty())
+                {
+                    _rustCount--;
+                }
+            }
+            SetHeadingText();
+            _segments.RemoveRange(i, _segments.Count - i);
+        }
     }
 
     private void BuildSegments()
     {
         _segments = _state.Run
-            .Select((ISegment segment) => new RustAlarmSegment(segment.Name))
+            .Select((ISegment segment) => new RustAlarmSegment(segment))
             .ToList();
         _componentRenderer.VisibleComponents = _segments
             .Where(segment => segment.IsRusty())
             .Cast<IComponent>()
             .Prepend(_heading);
         _rustCount = 0;
-        _heading.ValueLabel.Text = "-";
+        SetHeadingText();
     }
 }
