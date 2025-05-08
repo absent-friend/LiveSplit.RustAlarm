@@ -16,9 +16,10 @@ namespace LiveSplit.RustAlarm
 
         private static readonly Brush WARNING_COLOR = new SolidBrush(Color.Yellow);
 
-        private int _resetCounter;
+        private int _previousResetCount;
+        private int _resetCount;
         private int _resetThreshold;
-        private bool _forceDraw;
+        private bool _newlyRusty;
         private readonly SimpleLabel _nameLabel;
         private readonly GraphicsCache _cache;
 
@@ -42,38 +43,45 @@ namespace LiveSplit.RustAlarm
 
         internal RustAlarmSegment(ISegment segment)
         {
-            _resetCounter = 0;
+            _resetCount = 0;
             _resetThreshold = 3;
-            _forceDraw = false;
+            _newlyRusty = false;
             Segment = segment;
             _nameLabel = new(segment.Name);
             _cache = new();
             MinimumHeight = 25;
         }
 
-        internal (bool, bool) AddReset()
+        internal bool Reset()
         {
             bool wasClean = !IsRusty();
-            _resetCounter++;
+            _resetCount++;
             bool isRusty = IsRusty();
-            if (wasClean && isRusty)
-            {
-                _forceDraw = true;
-            }
-            return (wasClean, isRusty);
+            _newlyRusty = wasClean && isRusty;
+            return _newlyRusty;
         }
 
-        internal (bool, bool) Split()
+        internal bool Split()
         {
             bool wasRusty = IsRusty();
-            _resetCounter = 0;
+            _resetCount = 0;
             bool isClean = !IsRusty();
-            return (wasRusty, isClean);
+            return wasRusty && isClean;
+        }
+
+        internal void Undo()
+        {
+            _resetCount = _previousResetCount;
+        }
+
+        internal void RunEnded()
+        {
+            _previousResetCount = _resetCount;
         }
 
         internal bool IsRusty()
         {
-            return _resetCounter >= _resetThreshold;
+            return _resetCount >= _resetThreshold;
         }
 
         private void PrepareDraw(LiveSplitState state, LayoutMode mode)
@@ -133,10 +141,10 @@ namespace LiveSplit.RustAlarm
         {
             _cache.Restart();
             _cache["NameText"] = Segment.Name;
-            if (invalidator != null && (_cache.HasChanged || _forceDraw))
+            if (invalidator != null && (_cache.HasChanged || _newlyRusty))
             {
                 invalidator.Invalidate(0, 0, width, height);
-                _forceDraw = false;
+                _newlyRusty = false;
             }
         }
 

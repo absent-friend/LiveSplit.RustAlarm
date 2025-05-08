@@ -21,6 +21,7 @@ public sealed class RustAlarmComponent : IComponent
     private readonly RustAlarmSettings _settings;
     private readonly ComponentRendererComponent _componentRenderer;
     private readonly InfoTextComponent _heading;
+    private readonly Stack<IRustAlarmEvent> _eventStack;
     private List<RustAlarmSegment> _segments;
     private int _skipStart;
     private int _segmentIndex;
@@ -33,6 +34,7 @@ public sealed class RustAlarmComponent : IComponent
         _settings = new();
         _componentRenderer = new();
         _heading = new("Rusty Segments", "-");
+        _eventStack = new();
         BuildSegments();
         SetUpEventListeners();
     }
@@ -125,6 +127,7 @@ public sealed class RustAlarmComponent : IComponent
         _state.OnReset += _state_OnReset;
         _state.OnSkipSplit += _state_OnSkipSplit;
         _state.OnSplit += _state_OnSplit;
+        _state.OnUndoSplit += _state_OnUndoSplit;
         _state.RunManuallyModified += _state_RunManuallyModified;
     }
 
@@ -132,37 +135,88 @@ public sealed class RustAlarmComponent : IComponent
     {
         if (value != TimerPhase.Ended)
         {
-            RustAlarmSegment segment = _segments[_segmentIndex];
-            (bool wasClean, bool isRusty) = segment.AddReset();
-            if (wasClean && isRusty)
+            bool newlyRusty = _segments[_segmentIndex].Reset();
+            if (newlyRusty)
             {
                 _rustCount++;
                 SetHeadingText();
             }
         }
+        for (int i = 0; i < _segmentIndex; i++)
+        {
+            _segments[i].RunEnded();
+        }
         _segmentIndex = 0;
         _skipStart = 0;
+        _eventStack.Clear();
+    }
+
+    class SkipEvent(RustAlarmComponent component) : IRustAlarmEvent
+    {
+        public void Apply()
+        {
+            component._segmentIndex++;
+        }
+
+        public void Undo()
+        {
+            component._segmentIndex--;
+        }
     }
 
     private void _state_OnSkipSplit(object sender, EventArgs e)
     {
-        _segmentIndex++;
+        var skip = new SkipEvent(this);
+        skip.Apply();
+        _eventStack.Push(skip);
+    }
+
+    class SplitEvent(RustAlarmComponent component) : IRustAlarmEvent
+    {
+        private readonly int _skipStart = component._skipStart;
+        private readonly int _segmentIndex = component._segmentIndex;
+        private readonly int _rustCount = component._rustCount;
+
+        public void Apply()
+        {
+            for (int i = _skipStart; i <= _segmentIndex; i++)
+            {
+                bool newlyClean = component._segments[i].Split();
+                if (newlyClean)
+                {
+                    component._rustCount--;
+                }
+            }
+            component.SetHeadingText();
+            component._segmentIndex++;
+            component._skipStart = component._segmentIndex;
+        }
+
+        public void Undo()
+        {
+            component._skipStart = _skipStart;
+            component._segmentIndex = _segmentIndex;
+            component._rustCount = _rustCount;
+
+            for (int i = _skipStart; i <= _segmentIndex; i++)
+            {
+                component._segments[i].Undo();
+            }
+            component.SetHeadingText();
+        }
     }
 
     private void _state_OnSplit(object sender, EventArgs e)
     {
-        for (int i = _skipStart; i <= _segmentIndex; i++)
-        {
-            RustAlarmSegment segment = _segments[i];
-            (bool wasRusty, bool isClean) = segment.Split();
-            if (wasRusty && isClean)
-            {
-                _rustCount--;
-            }
-        }
-        SetHeadingText();
-        _segmentIndex++;
-        _skipStart = _segmentIndex;
+        var split = new SplitEvent(this);
+        split.Apply();
+        _eventStack.Push(split);
+    }
+
+    private void _state_OnUndoSplit(object sender, EventArgs e)
+    {
+        // undo won't fire if it's attempted on the first segment of the run, so we don't need to check count.
+        _eventStack.Pop().Undo();
     }
 
     private void SetHeadingText()
