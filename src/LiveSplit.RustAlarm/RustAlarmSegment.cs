@@ -71,7 +71,10 @@ namespace LiveSplit.RustAlarm
 
         internal void Undo()
         {
+            bool wasClean = !IsRusty();
             _resetCount = _previousResetCount;
+            bool isRusty = IsRusty();
+            _newlyRusty = wasClean && isRusty;
         }
 
         internal void RunEnded()

@@ -142,7 +142,7 @@ public sealed class RustAlarmComponent : IComponent
                 SetHeadingText();
             }
         }
-        for (int i = 0; i < _segmentIndex; i++)
+        for (int i = 0; i <= _segmentIndex; i++)
         {
             _segments[i].RunEnded();
         }
@@ -194,8 +194,8 @@ public sealed class RustAlarmComponent : IComponent
 
         public void Undo()
         {
-            component._skipStart = _skipStart;
             component._segmentIndex = _segmentIndex;
+            component._skipStart = _skipStart;
             component._rustCount = _rustCount;
 
             for (int i = _skipStart; i <= _segmentIndex; i++)
