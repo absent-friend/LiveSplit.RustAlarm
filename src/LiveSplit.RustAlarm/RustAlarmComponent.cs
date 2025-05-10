@@ -17,11 +17,12 @@ public sealed class RustAlarmComponent : IComponent
     public const string Name = "Rust Alarm";
 
     private readonly LiveSplitState _state;
-    private IRun _currentRun;
     private readonly RustAlarmSettings _settings;
+    private readonly RustAlarmSegmentCache _segmentCache;
+    private readonly Stack<IRustAlarmEvent> _eventStack;
     private readonly ComponentRendererComponent _componentRenderer;
     private readonly InfoTextComponent _heading;
-    private readonly Stack<IRustAlarmEvent> _eventStack;
+    private IRun _currentRun;
     private List<RustAlarmSegment> _segments;
     private int _skipStart;
     private int _segmentIndex;
@@ -30,12 +31,12 @@ public sealed class RustAlarmComponent : IComponent
     public RustAlarmComponent(LiveSplitState state)
     {
         _state = state;
-        _currentRun = state.Run;
         _settings = new();
+        _segmentCache = new();
+        _eventStack = new();
         _componentRenderer = new();
         _heading = new("Rusty Segments", "-");
-        _eventStack = new();
-        BuildSegments();
+        SetRun(state.Run);
         SetUpEventListeners();
     }
 
@@ -63,8 +64,7 @@ public sealed class RustAlarmComponent : IComponent
     {
         if (_currentRun != state.Run)
         {
-            _currentRun = state.Run;
-            BuildSegments();
+            SetRun(state.Run);
         }
 
         if (invalidator != null)
@@ -117,8 +117,9 @@ public sealed class RustAlarmComponent : IComponent
     public void Dispose()
     {
         _state.OnReset -= _state_OnReset;
-        _state.OnSplit -= _state_OnSplit;
         _state.OnSkipSplit -= _state_OnSkipSplit;
+        _state.OnSplit -= _state_OnSplit;
+        _state.OnUndoSplit -= _state_OnUndoSplit;
         _state.RunManuallyModified -= _state_RunManuallyModified;
     }
 
@@ -215,7 +216,7 @@ public sealed class RustAlarmComponent : IComponent
 
     private void _state_OnUndoSplit(object sender, EventArgs e)
     {
-        // undo won't fire if it's attempted on the first segment of the run, so we don't need to check count.
+        // Undo won't fire if it's attempted on the first segment of the run, so we don't need to check count.
         _eventStack.Pop().Undo();
     }
 
@@ -226,16 +227,11 @@ public sealed class RustAlarmComponent : IComponent
 
     private void _state_RunManuallyModified(object sender, EventArgs e)
     {
-        if (_state.Run != _currentRun)
+        if (_currentRun != _state.Run)
         {
             // User opened the splits editor and then cancelled.
-            //
-            // We have no way of unwinding the changes that might have been made up to this point,
-            // since there's no way to see from here when the user clicks OK on the editing form.
-            //
-            // We have to wipe it clean and rebuild.
-            _currentRun = _state.Run;
-            BuildSegments();
+            // Easier to wipe clean and rebuild than try to unwind whatever changes they might have made.
+            SetRun(_state.Run);
         }
         else
         {
@@ -245,19 +241,20 @@ public sealed class RustAlarmComponent : IComponent
 
     private void FixSegments()
     {
-        // When a segment is moved, the other segment that it swaps with is removed and added back in at its new location.
-        // The current procedure will register this as a split being deleted and a new (unrelated) split being added.
-        // We'll have to track segment-level settings outside RustAlarmSegment, or they'll be partly destroyed by a move.
         int i = 0;
         for (; i < _state.Run.Count && i < _segments.Count; i++)
         {
             ISegment segment = _state.Run[i];
-            if (_state.Run[i] == _segments[i].Segment)
+            if (segment == _segments[i].Segment)
+            {
+                // in case of name change
+                _segmentCache.Set(segment, _segments[i]);
                 continue;
+            }
             int newIndex = _segments.FindIndex(s => s.Segment == segment);
             if (newIndex == -1)
             {
-                _segments.Insert(i, new RustAlarmSegment(segment));
+                _segments.Insert(i, _segmentCache.GetOrCreate(segment));
             }
             else
             {
@@ -269,35 +266,31 @@ public sealed class RustAlarmComponent : IComponent
         {
             for (; i < _state.Run.Count; i++)
             {
-                _segments.Add(new RustAlarmSegment(_state.Run[i]));
+                _segments.Add(_segmentCache.GetOrCreate(_state.Run[i]));
             }
         }
         else if (i < _segments.Count)
         {
             // Everything that corresponds to a segment currently contained in the run should have been swapped or inserted into its correct place at an index < i.
             // Leftover segments were deleted in the splits editor.
-            for (int j = i; j < _segments.Count; j++)
-            {
-                if (_segments[j].IsRusty())
-                {
-                    _rustCount--;
-                }
-            }
-            SetHeadingText();
             _segments.RemoveRange(i, _segments.Count - i);
         }
+        _rustCount = _segments.Where(segment => segment.IsRusty()).Count();
+        SetHeadingText();
     }
 
-    private void BuildSegments()
+    private void SetRun(IRun run)
     {
-        _segments = _state.Run
-            .Select((ISegment segment) => new RustAlarmSegment(segment))
+        _currentRun = run;
+        _segmentCache.SetRun(run);
+        _segments = run
+            .Select(_segmentCache.GetOrCreate)
             .ToList();
         _componentRenderer.VisibleComponents = _segments
             .Where(segment => segment.IsRusty())
             .Cast<IComponent>()
             .Prepend(_heading);
-        _rustCount = 0;
+        _rustCount = _segments.Where(segment => segment.IsRusty()).Count();
         SetHeadingText();
     }
 }
