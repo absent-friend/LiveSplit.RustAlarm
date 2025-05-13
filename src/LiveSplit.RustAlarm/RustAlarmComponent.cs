@@ -18,7 +18,6 @@ public sealed class RustAlarmComponent : IComponent
 
     private readonly LiveSplitState _state;
     private readonly RustAlarmSettings _settings;
-    private readonly RustAlarmSegmentCache _segmentCache;
     private readonly Stack<IRustAlarmEvent> _eventStack;
     private readonly ComponentRendererComponent _componentRenderer;
     private readonly InfoTextComponent _heading;
@@ -32,7 +31,6 @@ public sealed class RustAlarmComponent : IComponent
     {
         _state = state;
         _settings = new();
-        _segmentCache = new();
         _eventStack = new();
         _componentRenderer = new();
         _heading = new("Rusty Segments", "-");
@@ -76,6 +74,12 @@ public sealed class RustAlarmComponent : IComponent
     public XmlNode GetSettings(XmlDocument document)
     {
         return _settings.GetSettings(document);
+    }
+
+    // This method is invoked dynamically by LiveSplit to detect layout changes efficiently. Despite appearances, it's not unused --- don't delete it!
+    public int GetSettingsHashCode()
+    {
+        return _settings.GetSettingsHashCode();
     }
 
     public void SetSettings(XmlNode settings)
@@ -247,14 +251,13 @@ public sealed class RustAlarmComponent : IComponent
             ISegment segment = _state.Run[i];
             if (segment == _segments[i].Segment)
             {
-                // in case of name change
-                _segmentCache.Set(segment, _segments[i]);
+                _settings.CheckForNameChange(_segments[i]);
                 continue;
             }
             int newIndex = _segments.FindIndex(s => s.Segment == segment);
             if (newIndex == -1)
             {
-                _segments.Insert(i, _segmentCache.GetOrCreate(segment));
+                _segments.Insert(i, _settings.GetOrCreateSegment(segment));
             }
             else
             {
@@ -266,7 +269,7 @@ public sealed class RustAlarmComponent : IComponent
         {
             for (; i < _state.Run.Count; i++)
             {
-                _segments.Add(_segmentCache.GetOrCreate(_state.Run[i]));
+                _segments.Add(_settings.GetOrCreateSegment(_state.Run[i]));
             }
         }
         else if (i < _segments.Count)
@@ -282,9 +285,9 @@ public sealed class RustAlarmComponent : IComponent
     private void SetRun(IRun run)
     {
         _currentRun = run;
-        _segmentCache.SetRun(run);
+        _settings.SetRun(run);
         _segments = run
-            .Select(_segmentCache.GetOrCreate)
+            .Select(_settings.GetOrCreateSegment)
             .ToList();
         _componentRenderer.VisibleComponents = _segments
             .Where(segment => segment.IsRusty())

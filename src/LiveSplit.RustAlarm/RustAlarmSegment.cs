@@ -1,4 +1,5 @@
 ﻿using LiveSplit.Model;
+using LiveSplit.RustAlarm.UI;
 using LiveSplit.UI;
 using LiveSplit.UI.Components;
 using System;
@@ -16,14 +17,14 @@ namespace LiveSplit.RustAlarm
 
         private static readonly Brush WARNING_COLOR = new SolidBrush(Color.Yellow);
 
-        private int _previousResetCount;
-        private int _resetCount;
-        private int _resetThreshold;
+        private int _previousFailureCount;
+        private int _failureCount;
         private bool _newlyRusty;
+        private readonly IRustAlarmSegmentSettings _settings;
         private readonly SimpleLabel _nameLabel;
         private readonly GraphicsCache _cache;
 
-        internal ISegment Segment { get; set; }
+        internal ISegment Segment { get; private set; }
 
         public float MinimumWidth => 20f;
 
@@ -41,21 +42,23 @@ namespace LiveSplit.RustAlarm
 
         public float PaddingRight => 7f;
 
-        internal RustAlarmSegment(ISegment segment)
+        internal RustAlarmSegment(ISegment segment, IRustAlarmSegmentSettings settings)
         {
-            _resetCount = 0;
-            _resetThreshold = 3;
+            _failureCount = 0;
             _newlyRusty = false;
             Segment = segment;
-            _nameLabel = new(segment.Name);
+            _settings = settings;
+            _nameLabel = new();
             _cache = new();
             MinimumHeight = 25;
+
+            UpdateName();
         }
 
         internal bool Reset()
         {
             bool wasClean = !IsRusty();
-            _resetCount++;
+            _failureCount++;
             bool isRusty = IsRusty();
             _newlyRusty = wasClean && isRusty;
             return _newlyRusty;
@@ -64,7 +67,7 @@ namespace LiveSplit.RustAlarm
         internal bool Split()
         {
             bool wasRusty = IsRusty();
-            _resetCount = 0;
+            _failureCount = 0;
             bool isClean = !IsRusty();
             return wasRusty && isClean;
         }
@@ -72,24 +75,29 @@ namespace LiveSplit.RustAlarm
         internal void Undo()
         {
             bool wasClean = !IsRusty();
-            _resetCount = _previousResetCount;
+            _failureCount = _previousFailureCount;
             bool isRusty = IsRusty();
             _newlyRusty = wasClean && isRusty;
         }
 
         internal void RunEnded()
         {
-            _previousResetCount = _resetCount;
+            _previousFailureCount = _failureCount;
         }
 
         internal bool IsRusty()
         {
-            return _resetCount >= _resetThreshold;
+            return _failureCount >= _settings.RustThreshold;
+        }
+
+        internal string UpdateName()
+        {
+            _nameLabel.Text = Segment.Name;
+            return _settings.SetName(Segment.Name);
         }
 
         private void PrepareDraw(LiveSplitState state, LayoutMode mode)
         {
-            _nameLabel.Text = Segment.Name;
             _nameLabel.Font = state.LayoutSettings.TextFont;
             _nameLabel.ForeColor = state.LayoutSettings.TextColor;
             _nameLabel.OutlineColor = state.LayoutSettings.TextOutlineColor;
@@ -143,7 +151,7 @@ namespace LiveSplit.RustAlarm
         public void Update(IInvalidator invalidator, LiveSplitState state, float width, float height, LayoutMode mode)
         {
             _cache.Restart();
-            _cache["NameText"] = Segment.Name;
+            _cache["NameText"] = _nameLabel.Text;
             if (invalidator != null && (_cache.HasChanged || _newlyRusty))
             {
                 invalidator.Invalidate(0, 0, width, height);
