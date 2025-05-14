@@ -129,7 +129,6 @@ internal partial class RustAlarmSettings : UserControl
         _currentRun = run;
         _idMapper.SetRun(run);
 
-        Size = _initialSize;
         tableLayoutSegments.Controls.Clear();
         tableLayoutSegments.RowCount = _currentRun.Count;
         Dictionary<int, RustAlarmSegmentSettings> runSettings = CurrentSettings();
@@ -140,6 +139,7 @@ internal partial class RustAlarmSettings : UserControl
             tableLayoutSegments.Controls.Add(segmentSettings, 0, i++);
             tableLayoutSegments.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         }
+        Size = tableLayoutSegments.Size;
     }
 
     private RustAlarmSegmentSettings GetOrCreateSegmentSettings(int segmentKey, Dictionary<int, RustAlarmSegmentSettings> runSettings)

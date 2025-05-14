@@ -33,9 +33,6 @@ partial class RustAlarmSettings
             // 
             // tableLayoutSegments
             // 
-            this.tableLayoutSegments.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.tableLayoutSegments.AutoSize = true;
             this.tableLayoutSegments.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.tableLayoutSegments.ColumnCount = 1;
@@ -44,17 +41,16 @@ partial class RustAlarmSettings
             this.tableLayoutSegments.Name = "tableLayoutSegments";
             this.tableLayoutSegments.RowCount = 1;
             this.tableLayoutSegments.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutSegments.Size = new System.Drawing.Size(470, 0);
+            this.tableLayoutSegments.Size = new System.Drawing.Size(0, 0);
             this.tableLayoutSegments.TabIndex = 0;
             // 
             // RustAlarmSettings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.AutoSize = true;
             this.Controls.Add(this.tableLayoutSegments);
             this.Name = "RustAlarmSettings";
-            this.Size = new System.Drawing.Size(476, 3);
+            this.Size = new System.Drawing.Size(476, 0);
             this.ResumeLayout(false);
             this.PerformLayout();
 

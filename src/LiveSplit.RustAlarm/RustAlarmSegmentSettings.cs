@@ -11,7 +11,6 @@ namespace LiveSplit.RustAlarm
         {
             InitializeComponent();
             textRustThreshold.DataBindings.Add(nameof(textRustThreshold.Text), this, nameof(RustThreshold), false, DataSourceUpdateMode.OnPropertyChanged);
-            Anchor = AnchorStyles.Left | AnchorStyles.Right;
         }
         
         // 4 = shortest coinflip failure streak w/ < 10% odds

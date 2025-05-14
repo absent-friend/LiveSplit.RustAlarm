@@ -30,26 +30,13 @@
         {
             System.Windows.Forms.TableLayoutPanel tableLayoutThresholds;
             System.Windows.Forms.Label labelRustThreshold;
-            this.groupBox = new System.Windows.Forms.GroupBox();
             this.textRustThreshold = new System.Windows.Forms.TextBox();
+            this.groupBox = new System.Windows.Forms.GroupBox();
             tableLayoutThresholds = new System.Windows.Forms.TableLayoutPanel();
             labelRustThreshold = new System.Windows.Forms.Label();
-            this.groupBox.SuspendLayout();
             tableLayoutThresholds.SuspendLayout();
+            this.groupBox.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // groupBox
-            // 
-            this.groupBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupBox.Controls.Add(tableLayoutThresholds);
-            this.groupBox.Location = new System.Drawing.Point(3, 3);
-            this.groupBox.Name = "groupBox";
-            this.groupBox.Size = new System.Drawing.Size(368, 56);
-            this.groupBox.TabIndex = 0;
-            this.groupBox.TabStop = false;
-            this.groupBox.Text = "Segment:";
             // 
             // tableLayoutThresholds
             // 
@@ -65,7 +52,7 @@
             tableLayoutThresholds.Name = "tableLayoutThresholds";
             tableLayoutThresholds.RowCount = 1;
             tableLayoutThresholds.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            tableLayoutThresholds.Size = new System.Drawing.Size(356, 31);
+            tableLayoutThresholds.Size = new System.Drawing.Size(438, 31);
             tableLayoutThresholds.TabIndex = 0;
             // 
             // labelRustThreshold
@@ -83,21 +70,30 @@
             this.textRustThreshold.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.textRustThreshold.Location = new System.Drawing.Point(91, 5);
             this.textRustThreshold.Name = "textRustThreshold";
-            this.textRustThreshold.Size = new System.Drawing.Size(262, 20);
+            this.textRustThreshold.Size = new System.Drawing.Size(344, 20);
             this.textRustThreshold.TabIndex = 1;
+            // 
+            // groupBox
+            // 
+            this.groupBox.Controls.Add(tableLayoutThresholds);
+            this.groupBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.groupBox.Location = new System.Drawing.Point(0, 0);
+            this.groupBox.Name = "groupBox";
+            this.groupBox.Size = new System.Drawing.Size(450, 56);
+            this.groupBox.TabIndex = 0;
+            this.groupBox.TabStop = false;
+            this.groupBox.Text = "Segment:";
             // 
             // RustAlarmSegmentSettings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.AutoSize = true;
-            this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.Controls.Add(this.groupBox);
             this.Name = "RustAlarmSegmentSettings";
-            this.Size = new System.Drawing.Size(374, 62);
-            this.groupBox.ResumeLayout(false);
+            this.Size = new System.Drawing.Size(450, 56);
             tableLayoutThresholds.ResumeLayout(false);
             tableLayoutThresholds.PerformLayout();
+            this.groupBox.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
