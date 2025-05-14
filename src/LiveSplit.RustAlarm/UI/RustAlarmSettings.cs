@@ -129,17 +129,17 @@ internal partial class RustAlarmSettings : UserControl
         _currentRun = run;
         _idMapper.SetRun(run);
 
-        tableLayoutSegments.Controls.Clear();
-        tableLayoutSegments.RowCount = _currentRun.Count;
-        Dictionary<int, RustAlarmSegmentSettings> runSettings = CurrentSettings();
-        int i = 0;
-        foreach (ISegment segment in _currentRun)
-        {
-            RustAlarmSegmentSettings segmentSettings = GetOrCreateSegmentSettings(_idMapper.GetID(segment), runSettings);
-            tableLayoutSegments.Controls.Add(segmentSettings, 0, i++);
-            tableLayoutSegments.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-        }
-        Size = tableLayoutSegments.Size;
+        //tableLayoutSegments.Controls.Clear();
+        //tableLayoutSegments.RowCount = _currentRun.Count;
+        //Dictionary<int, RustAlarmSegmentSettings> runSettings = CurrentSettings();
+        //int i = 0;
+        //foreach (ISegment segment in _currentRun)
+        //{
+        //    RustAlarmSegmentSettings segmentSettings = GetOrCreateSegmentSettings(_idMapper.GetID(segment), runSettings);
+        //    tableLayoutSegments.Controls.Add(segmentSettings, 0, i++);
+        //    tableLayoutSegments.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        //}
+        //Size = tableLayoutSegments.Size;
     }
 
     private RustAlarmSegmentSettings GetOrCreateSegmentSettings(int segmentKey, Dictionary<int, RustAlarmSegmentSettings> runSettings)
