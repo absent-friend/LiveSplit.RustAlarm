@@ -90,10 +90,10 @@ partial class RustAlarmSettings
             // 
             this.tableLayoutSettings.ColumnCount = 1;
             this.tableLayoutSettings.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutSettings.Controls.Add(this.tableLayoutBackground, 0, 0);
-            this.tableLayoutSettings.Controls.Add(this.groupThresholdColors, 0, 2);
-            this.tableLayoutSettings.Controls.Add(this.groupBoxHeading, 0, 1);
-            this.tableLayoutSettings.Controls.Add(this.groupSegments, 0, 3);
+            this.tableLayoutSettings.Controls.Add(this.tableLayoutBackground, 0, 3);
+            this.tableLayoutSettings.Controls.Add(this.groupThresholdColors, 0, 1);
+            this.tableLayoutSettings.Controls.Add(this.groupBoxHeading, 0, 2);
+            this.tableLayoutSettings.Controls.Add(this.groupSegments, 0, 0);
             this.tableLayoutSettings.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutSettings.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutSettings.Name = "tableLayoutSettings";
@@ -102,7 +102,8 @@ partial class RustAlarmSettings
             this.tableLayoutSettings.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutSettings.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutSettings.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutSettings.Size = new System.Drawing.Size(460, 769);
+            this.tableLayoutSettings.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutSettings.Size = new System.Drawing.Size(459, 769);
             this.tableLayoutSettings.TabIndex = 0;
             // 
             // tableLayoutBackground
@@ -119,11 +120,11 @@ partial class RustAlarmSettings
             this.tableLayoutBackground.Controls.Add(this.btnBackgroundColor1, 2, 0);
             this.tableLayoutBackground.Controls.Add(this.lblBackgroundColor, 0, 0);
             this.tableLayoutBackground.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutBackground.Location = new System.Drawing.Point(3, 3);
+            this.tableLayoutBackground.Location = new System.Drawing.Point(3, 737);
             this.tableLayoutBackground.Name = "tableLayoutBackground";
             this.tableLayoutBackground.RowCount = 1;
             this.tableLayoutBackground.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutBackground.Size = new System.Drawing.Size(454, 29);
+            this.tableLayoutBackground.Size = new System.Drawing.Size(453, 29);
             this.tableLayoutBackground.TabIndex = 0;
             // 
             // cmbGradientType
@@ -133,7 +134,7 @@ partial class RustAlarmSettings
             this.cmbGradientType.FormattingEnabled = true;
             this.cmbGradientType.Location = new System.Drawing.Point(220, 4);
             this.cmbGradientType.Name = "cmbGradientType";
-            this.cmbGradientType.Size = new System.Drawing.Size(231, 21);
+            this.cmbGradientType.Size = new System.Drawing.Size(230, 21);
             this.cmbGradientType.TabIndex = 0;
             // 
             // btnBackgroundColor2
@@ -172,9 +173,9 @@ partial class RustAlarmSettings
             // groupBoxHeading
             // 
             this.groupBoxHeading.Controls.Add(this.tableLayoutHeading);
-            this.groupBoxHeading.Location = new System.Drawing.Point(3, 38);
+            this.groupBoxHeading.Location = new System.Drawing.Point(3, 514);
             this.groupBoxHeading.Name = "groupBoxHeading";
-            this.groupBoxHeading.Size = new System.Drawing.Size(454, 217);
+            this.groupBoxHeading.Size = new System.Drawing.Size(453, 217);
             this.groupBoxHeading.TabIndex = 1;
             this.groupBoxHeading.TabStop = false;
             this.groupBoxHeading.Text = "Heading";
@@ -394,9 +395,9 @@ partial class RustAlarmSettings
             // groupThresholdColors
             // 
             this.groupThresholdColors.Controls.Add(this.tableLayoutThresholds);
-            this.groupThresholdColors.Location = new System.Drawing.Point(3, 261);
+            this.groupThresholdColors.Location = new System.Drawing.Point(3, 430);
             this.groupThresholdColors.Name = "groupThresholdColors";
-            this.groupThresholdColors.Size = new System.Drawing.Size(454, 78);
+            this.groupThresholdColors.Size = new System.Drawing.Size(453, 78);
             this.groupThresholdColors.TabIndex = 2;
             this.groupThresholdColors.TabStop = false;
             this.groupThresholdColors.Text = "Threshold Colors";
@@ -418,7 +419,7 @@ partial class RustAlarmSettings
             this.tableLayoutThresholds.RowCount = 2;
             this.tableLayoutThresholds.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutThresholds.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutThresholds.Size = new System.Drawing.Size(448, 59);
+            this.tableLayoutThresholds.Size = new System.Drawing.Size(447, 59);
             this.tableLayoutThresholds.TabIndex = 0;
             // 
             // lblWarningColor
@@ -455,9 +456,9 @@ partial class RustAlarmSettings
             // groupSegments
             // 
             this.groupSegments.Controls.Add(this.tableLayoutSegments);
-            this.groupSegments.Location = new System.Drawing.Point(3, 345);
+            this.groupSegments.Location = new System.Drawing.Point(3, 3);
             this.groupSegments.Name = "groupSegments";
-            this.groupSegments.Size = new System.Drawing.Size(454, 421);
+            this.groupSegments.Size = new System.Drawing.Size(453, 421);
             this.groupSegments.TabIndex = 3;
             this.groupSegments.TabStop = false;
             this.groupSegments.Text = "Segments";
@@ -468,20 +469,20 @@ partial class RustAlarmSettings
             this.tableLayoutSegments.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 59F));
             this.tableLayoutSegments.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 314F));
             this.tableLayoutSegments.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 75F));
-            this.tableLayoutSegments.Controls.Add(this.btnSegmentsColor, 1, 1);
-            this.tableLayoutSegments.Controls.Add(this.chkSegmentsColor, 0, 1);
-            this.tableLayoutSegments.Controls.Add(this.btnSegmentsFont, 2, 0);
-            this.tableLayoutSegments.Controls.Add(this.lblSegmentsFont, 1, 0);
-            this.tableLayoutSegments.Controls.Add(this.chkSegmentsFont, 0, 0);
-            this.tableLayoutSegments.Controls.Add(this.dataGridSegments, 0, 2);
+            this.tableLayoutSegments.Controls.Add(this.btnSegmentsColor, 1, 2);
+            this.tableLayoutSegments.Controls.Add(this.chkSegmentsColor, 0, 2);
+            this.tableLayoutSegments.Controls.Add(this.btnSegmentsFont, 2, 1);
+            this.tableLayoutSegments.Controls.Add(this.lblSegmentsFont, 1, 1);
+            this.tableLayoutSegments.Controls.Add(this.chkSegmentsFont, 0, 1);
+            this.tableLayoutSegments.Controls.Add(this.dataGridSegments, 0, 0);
             this.tableLayoutSegments.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutSegments.Location = new System.Drawing.Point(3, 16);
             this.tableLayoutSegments.Name = "tableLayoutSegments";
             this.tableLayoutSegments.RowCount = 3;
+            this.tableLayoutSegments.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutSegments.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutSegments.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutSegments.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 131F));
-            this.tableLayoutSegments.Size = new System.Drawing.Size(448, 402);
+            this.tableLayoutSegments.Size = new System.Drawing.Size(447, 402);
             this.tableLayoutSegments.TabIndex = 0;
             // 
             // btnWarningColor
@@ -499,7 +500,7 @@ partial class RustAlarmSettings
             // 
             this.chkSegmentsFont.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.chkSegmentsFont.AutoSize = true;
-            this.chkSegmentsFont.Location = new System.Drawing.Point(3, 6);
+            this.chkSegmentsFont.Location = new System.Drawing.Point(3, 350);
             this.chkSegmentsFont.Name = "chkSegmentsFont";
             this.chkSegmentsFont.Size = new System.Drawing.Size(50, 17);
             this.chkSegmentsFont.TabIndex = 1;
@@ -510,7 +511,7 @@ partial class RustAlarmSettings
             // 
             this.lblSegmentsFont.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.lblSegmentsFont.AutoSize = true;
-            this.lblSegmentsFont.Location = new System.Drawing.Point(62, 8);
+            this.lblSegmentsFont.Location = new System.Drawing.Point(62, 352);
             this.lblSegmentsFont.Name = "lblSegmentsFont";
             this.lblSegmentsFont.Size = new System.Drawing.Size(308, 13);
             this.lblSegmentsFont.TabIndex = 4;
@@ -519,7 +520,7 @@ partial class RustAlarmSettings
             // 
             this.btnSegmentsFont.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.btnSegmentsFont.Enabled = false;
-            this.btnSegmentsFont.Location = new System.Drawing.Point(376, 3);
+            this.btnSegmentsFont.Location = new System.Drawing.Point(376, 347);
             this.btnSegmentsFont.Name = "btnSegmentsFont";
             this.btnSegmentsFont.Size = new System.Drawing.Size(69, 23);
             this.btnSegmentsFont.TabIndex = 5;
@@ -530,7 +531,7 @@ partial class RustAlarmSettings
             // 
             this.chkSegmentsColor.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.chkSegmentsColor.AutoSize = true;
-            this.chkSegmentsColor.Location = new System.Drawing.Point(3, 35);
+            this.chkSegmentsColor.Location = new System.Drawing.Point(3, 379);
             this.chkSegmentsColor.Name = "chkSegmentsColor";
             this.chkSegmentsColor.Size = new System.Drawing.Size(53, 17);
             this.chkSegmentsColor.TabIndex = 6;
@@ -543,7 +544,7 @@ partial class RustAlarmSettings
             this.btnSegmentsColor.BackColor = System.Drawing.Color.White;
             this.btnSegmentsColor.Enabled = false;
             this.btnSegmentsColor.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.btnSegmentsColor.Location = new System.Drawing.Point(62, 32);
+            this.btnSegmentsColor.Location = new System.Drawing.Point(62, 376);
             this.btnSegmentsColor.Name = "btnSegmentsColor";
             this.btnSegmentsColor.Size = new System.Drawing.Size(23, 23);
             this.btnSegmentsColor.TabIndex = 7;
@@ -563,9 +564,11 @@ partial class RustAlarmSettings
             this.dataGridSegments_DangerThreshold});
             this.tableLayoutSegments.SetColumnSpan(this.dataGridSegments, 3);
             this.dataGridSegments.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dataGridSegments.Location = new System.Drawing.Point(3, 61);
+            this.dataGridSegments.Location = new System.Drawing.Point(3, 3);
+            this.dataGridSegments.MultiSelect = false;
             this.dataGridSegments.Name = "dataGridSegments";
             this.dataGridSegments.RowHeadersVisible = false;
+            this.dataGridSegments.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
             this.dataGridSegments.Size = new System.Drawing.Size(442, 338);
             this.dataGridSegments.TabIndex = 8;
             // 
@@ -575,6 +578,7 @@ partial class RustAlarmSettings
             this.dataGridSegments_Name.HeaderText = "Segment";
             this.dataGridSegments_Name.Name = "dataGridSegments_Name";
             this.dataGridSegments_Name.ReadOnly = true;
+            this.dataGridSegments_Name.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             this.dataGridSegments_Name.Width = 114;
             // 
             // dataGridSegments_ExpectedSuccessRate
@@ -582,6 +586,7 @@ partial class RustAlarmSettings
             this.dataGridSegments_ExpectedSuccessRate.HeaderText = "Success %";
             this.dataGridSegments_ExpectedSuccessRate.Name = "dataGridSegments_ExpectedSuccessRate";
             this.dataGridSegments_ExpectedSuccessRate.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.dataGridSegments_ExpectedSuccessRate.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             this.dataGridSegments_ExpectedSuccessRate.ToolTipText = "How often do you expect to succeed in this segment?";
             this.dataGridSegments_ExpectedSuccessRate.Width = 85;
             // 
@@ -590,6 +595,7 @@ partial class RustAlarmSettings
             this.dataGridSegments_MaxTimeLoss.HeaderText = "Max Time Loss";
             this.dataGridSegments_MaxTimeLoss.Name = "dataGridSegments_MaxTimeLoss";
             this.dataGridSegments_MaxTimeLoss.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.dataGridSegments_MaxTimeLoss.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             this.dataGridSegments_MaxTimeLoss.ToolTipText = "How much time loss are you willing to accept in this segment?";
             this.dataGridSegments_MaxTimeLoss.Width = 80;
             // 
@@ -598,6 +604,7 @@ partial class RustAlarmSettings
             this.dataGridSegments_WarningThreshold.HeaderText = "Warning Threshold";
             this.dataGridSegments_WarningThreshold.Name = "dataGridSegments_WarningThreshold";
             this.dataGridSegments_WarningThreshold.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.dataGridSegments_WarningThreshold.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             this.dataGridSegments_WarningThreshold.ToolTipText = "The number of back-to-back failures required to flag this segment at the \"Warning" +
     "\" level.";
             this.dataGridSegments_WarningThreshold.Width = 80;
@@ -607,6 +614,7 @@ partial class RustAlarmSettings
             this.dataGridSegments_DangerThreshold.HeaderText = "Danger Threshold";
             this.dataGridSegments_DangerThreshold.Name = "dataGridSegments_DangerThreshold";
             this.dataGridSegments_DangerThreshold.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.dataGridSegments_DangerThreshold.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             this.dataGridSegments_DangerThreshold.ToolTipText = "The number of back-to-back failures required to flag this segment at the \"Danger\"" +
     " level.";
             this.dataGridSegments_DangerThreshold.Width = 80;
@@ -617,7 +625,7 @@ partial class RustAlarmSettings
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.tableLayoutSettings);
             this.Name = "RustAlarmSettings";
-            this.Size = new System.Drawing.Size(460, 769);
+            this.Size = new System.Drawing.Size(459, 769);
             this.tableLayoutSettings.ResumeLayout(false);
             this.tableLayoutSettings.PerformLayout();
             this.tableLayoutBackground.ResumeLayout(false);
