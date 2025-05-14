@@ -103,7 +103,7 @@ partial class RustAlarmSettings
             this.tableLayoutSettings.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutSettings.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutSettings.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutSettings.Size = new System.Drawing.Size(459, 769);
+            this.tableLayoutSettings.Size = new System.Drawing.Size(459, 738);
             this.tableLayoutSettings.TabIndex = 0;
             // 
             // tableLayoutBackground
@@ -120,7 +120,7 @@ partial class RustAlarmSettings
             this.tableLayoutBackground.Controls.Add(this.btnBackgroundColor1, 2, 0);
             this.tableLayoutBackground.Controls.Add(this.lblBackgroundColor, 0, 0);
             this.tableLayoutBackground.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutBackground.Location = new System.Drawing.Point(3, 737);
+            this.tableLayoutBackground.Location = new System.Drawing.Point(3, 707);
             this.tableLayoutBackground.Name = "tableLayoutBackground";
             this.tableLayoutBackground.RowCount = 1;
             this.tableLayoutBackground.RowStyles.Add(new System.Windows.Forms.RowStyle());
@@ -173,7 +173,7 @@ partial class RustAlarmSettings
             // groupBoxHeading
             // 
             this.groupBoxHeading.Controls.Add(this.tableLayoutHeading);
-            this.groupBoxHeading.Location = new System.Drawing.Point(3, 514);
+            this.groupBoxHeading.Location = new System.Drawing.Point(3, 484);
             this.groupBoxHeading.Name = "groupBoxHeading";
             this.groupBoxHeading.Size = new System.Drawing.Size(453, 217);
             this.groupBoxHeading.TabIndex = 1;
@@ -397,7 +397,7 @@ partial class RustAlarmSettings
             this.groupThresholdColors.Controls.Add(this.tableLayoutThresholds);
             this.groupThresholdColors.Location = new System.Drawing.Point(3, 430);
             this.groupThresholdColors.Name = "groupThresholdColors";
-            this.groupThresholdColors.Size = new System.Drawing.Size(453, 78);
+            this.groupThresholdColors.Size = new System.Drawing.Size(453, 48);
             this.groupThresholdColors.TabIndex = 2;
             this.groupThresholdColors.TabStop = false;
             this.groupThresholdColors.Text = "Threshold Colors";
@@ -406,20 +406,21 @@ partial class RustAlarmSettings
             // 
             this.tableLayoutThresholds.AutoSize = true;
             this.tableLayoutThresholds.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.tableLayoutThresholds.ColumnCount = 2;
+            this.tableLayoutThresholds.ColumnCount = 4;
+            this.tableLayoutThresholds.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 59F));
+            this.tableLayoutThresholds.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 29F));
             this.tableLayoutThresholds.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.tableLayoutThresholds.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 78F));
+            this.tableLayoutThresholds.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 54F));
             this.tableLayoutThresholds.Controls.Add(this.btnWarningColor, 1, 0);
             this.tableLayoutThresholds.Controls.Add(this.lblWarningColor, 0, 0);
-            this.tableLayoutThresholds.Controls.Add(this.lblThresholdColor1, 0, 1);
-            this.tableLayoutThresholds.Controls.Add(this.btnDangerColor, 1, 1);
+            this.tableLayoutThresholds.Controls.Add(this.lblThresholdColor1, 2, 0);
+            this.tableLayoutThresholds.Controls.Add(this.btnDangerColor, 3, 0);
             this.tableLayoutThresholds.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutThresholds.Location = new System.Drawing.Point(3, 16);
             this.tableLayoutThresholds.Name = "tableLayoutThresholds";
-            this.tableLayoutThresholds.RowCount = 2;
+            this.tableLayoutThresholds.RowCount = 1;
             this.tableLayoutThresholds.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutThresholds.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutThresholds.Size = new System.Drawing.Size(447, 59);
+            this.tableLayoutThresholds.Size = new System.Drawing.Size(447, 29);
             this.tableLayoutThresholds.TabIndex = 0;
             // 
             // lblWarningColor
@@ -428,7 +429,7 @@ partial class RustAlarmSettings
             this.lblWarningColor.AutoSize = true;
             this.lblWarningColor.Location = new System.Drawing.Point(3, 8);
             this.lblWarningColor.Name = "lblWarningColor";
-            this.lblWarningColor.Size = new System.Drawing.Size(50, 13);
+            this.lblWarningColor.Size = new System.Drawing.Size(53, 13);
             this.lblWarningColor.TabIndex = 0;
             this.lblWarningColor.Text = "Warning:";
             // 
@@ -436,9 +437,9 @@ partial class RustAlarmSettings
             // 
             this.lblThresholdColor1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.lblThresholdColor1.AutoSize = true;
-            this.lblThresholdColor1.Location = new System.Drawing.Point(3, 37);
+            this.lblThresholdColor1.Location = new System.Drawing.Point(91, 8);
             this.lblThresholdColor1.Name = "lblThresholdColor1";
-            this.lblThresholdColor1.Size = new System.Drawing.Size(50, 13);
+            this.lblThresholdColor1.Size = new System.Drawing.Size(45, 13);
             this.lblThresholdColor1.TabIndex = 2;
             this.lblThresholdColor1.Text = "Danger:";
             // 
@@ -447,7 +448,7 @@ partial class RustAlarmSettings
             this.btnDangerColor.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.btnDangerColor.BackColor = System.Drawing.Color.Red;
             this.btnDangerColor.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.btnDangerColor.Location = new System.Drawing.Point(59, 32);
+            this.btnDangerColor.Location = new System.Drawing.Point(142, 3);
             this.btnDangerColor.Name = "btnDangerColor";
             this.btnDangerColor.Size = new System.Drawing.Size(23, 23);
             this.btnDangerColor.TabIndex = 6;
@@ -490,7 +491,7 @@ partial class RustAlarmSettings
             this.btnWarningColor.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.btnWarningColor.BackColor = System.Drawing.Color.Yellow;
             this.btnWarningColor.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.btnWarningColor.Location = new System.Drawing.Point(59, 3);
+            this.btnWarningColor.Location = new System.Drawing.Point(62, 3);
             this.btnWarningColor.Name = "btnWarningColor";
             this.btnWarningColor.Size = new System.Drawing.Size(23, 23);
             this.btnWarningColor.TabIndex = 7;
@@ -625,7 +626,7 @@ partial class RustAlarmSettings
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.tableLayoutSettings);
             this.Name = "RustAlarmSettings";
-            this.Size = new System.Drawing.Size(459, 769);
+            this.Size = new System.Drawing.Size(459, 738);
             this.tableLayoutSettings.ResumeLayout(false);
             this.tableLayoutSettings.PerformLayout();
             this.tableLayoutBackground.ResumeLayout(false);
