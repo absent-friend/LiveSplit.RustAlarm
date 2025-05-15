@@ -1,5 +1,6 @@
 ﻿using LiveSplit.Model;
 using LiveSplit.RustAlarm.UI;
+using LiveSplit.TimeFormatters;
 using LiveSplit.UI;
 using LiveSplit.UI.Components;
 using System;
@@ -15,16 +16,34 @@ namespace LiveSplit.RustAlarm
         // Parts of this class were adapted from LiveSplit.UI.Components.InfoTextComponent.
         // Especially the drawing of the text, which involves some rather magical nummbers.
 
+        private static readonly ShortTimeFormatterMilliseconds TIME_FORMATTER = new()
+        {
+            AutomaticPrecision = true,
+        };
         private static readonly Brush WARNING_COLOR = new SolidBrush(Color.Yellow);
 
+        private ISegment _segment;
+        private string _name;
+        private decimal _failRate;
+        private TimeSpan? _maxTimeLoss;
         private int _previousFailureCount;
         private int _failureCount;
         private bool _newlyRusty;
-        private readonly IRustAlarmSegmentSettings _settings;
+        private readonly RustAlarmSettings _settings;
         private readonly SimpleLabel _nameLabel;
         private readonly GraphicsCache _cache;
 
-        internal ISegment Segment { get; private set; }
+        internal ISegment Segment {
+            get => _segment;
+            set
+            {
+                if (_segment == null)
+                {
+                    _segment = value;
+                    UpdateName();
+                }
+            }
+        }
 
         public float MinimumWidth => 20f;
 
@@ -40,19 +59,68 @@ namespace LiveSplit.RustAlarm
 
         public float PaddingLeft => 7f;
 
-        public float PaddingRight => 7f;
+        public float PaddingRight => 7f; 
+        
+        public string Name {
+            get => _name;
+            private set
+            {
+                _name = value;
+            }
+        }
 
-        internal RustAlarmSegment(ISegment segment, IRustAlarmSegmentSettings settings)
+        public decimal FailRate {
+            get => _failRate; 
+            set
+            {
+                if (_failRate != value)
+                {
+                    _failRate = value;
+                    int streak = 1;
+                    decimal failOdds = _failRate / 100m;
+                    decimal streakOdds = failOdds;
+                    while (streakOdds >= .1m)
+                    {
+                        streakOdds *= failOdds;
+                        streak++;
+                    }
+                    WarningThreshold = streak;
+                    while (streakOdds >= .01m)
+                    {
+                        streakOdds *= failOdds;
+                        streak++;
+                    }
+                    DangerThreshold = streak;
+                }
+            } 
+        }
+
+        public string MaxTimeLossString
         {
+            get
+            {
+                return _maxTimeLoss == null ? "" : TIME_FORMATTER.Format(_maxTimeLoss);
+            }
+            set
+            {
+                _maxTimeLoss = TimeSpanParser.ParseNullable(value);
+            }
+        }
+
+        public int WarningThreshold { get; set; } = 4;
+
+        public int DangerThreshold { get; set; } = 7;
+
+        internal RustAlarmSegment(RustAlarmSettings settings)
+        {
+            _failRate = 50m;
             _failureCount = 0;
             _newlyRusty = false;
-            Segment = segment;
             _settings = settings;
             _nameLabel = new();
             _cache = new();
+            
             MinimumHeight = 25;
-
-            UpdateName();
         }
 
         internal bool Reset()
@@ -87,13 +155,15 @@ namespace LiveSplit.RustAlarm
 
         internal bool IsRusty()
         {
-            return _failureCount >= _settings.RustThreshold;
+            return _failureCount >= WarningThreshold;
         }
 
         internal string UpdateName()
         {
-            _nameLabel.Text = Segment.Name;
-            return _settings.SetName(Segment.Name);
+            string oldName = _name;
+            _name = Segment.Name;
+            _nameLabel.Text = Name;
+            return oldName;
         }
 
         private void PrepareDraw(LiveSplitState state, LayoutMode mode)

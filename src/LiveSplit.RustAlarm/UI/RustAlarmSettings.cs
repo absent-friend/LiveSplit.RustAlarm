@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Drawing;
+﻿using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
 using System.Xml;
 using LiveSplit.Model;
@@ -8,20 +8,30 @@ namespace LiveSplit.RustAlarm.UI;
 
 internal partial class RustAlarmSettings : UserControl
 {
-    private readonly Size _initialSize;
     private readonly RustAlarmIDMapper _idMapper;
-    private readonly Dictionary<string, Dictionary<int, RustAlarmSegmentSettings>> _settings;
     private readonly Dictionary<string, Dictionary<int, RustAlarmSegment>> _segmentCache;
+    private readonly BindingSource _segmentsGridData;
     private IRun _currentRun;
 
     internal RustAlarmSettings()
     {
         InitializeComponent();
-        _initialSize = Size;
 
         _idMapper = new();
-        _settings = [];
         _segmentCache = [];
+        _segmentsGridData = [];
+
+        dataGridSegments.AutoGenerateColumns = false;
+        dataGridSegments.DataSource = _segmentsGridData;
+        dataGridSegments_Name.DataPropertyName = "Name";
+        dataGridSegments_FailRate.DataPropertyName = "FailRate";
+        dataGridSegments_MaxTimeLoss.DataPropertyName = "MaxTimeLossString";
+        dataGridSegments_WarningThreshold.DataPropertyName = "WarningThreshold";
+        dataGridSegments_DangerThreshold.DataPropertyName = "DangerThreshold";
+        
+        dataGridSegments.CellEndEdit += dataGridSegments_CellEndEdit;
+        dataGridSegments.CellValidated += dataGridSegments_CellValidated;
+        dataGridSegments.CellValidating += dataGridSegments_CellValidating;
     }
 
     internal XmlNode GetSettings(XmlDocument document)
@@ -39,42 +49,42 @@ internal partial class RustAlarmSettings : UserControl
     private int BuildSettingsXML(XmlDocument document, XmlNode parent)
     {
         int hashCode = 0;
-        foreach (KeyValuePair<string, Dictionary<int, RustAlarmSegmentSettings>> run in _settings)
+        foreach (KeyValuePair<string, Dictionary<int, RustAlarmSegment>> run in _segmentCache)
         {
-            hashCode ^= run.Key.GetHashCode();
-            XmlNode runParent = null;
-            if (document != null)
-            {
-                runParent = document.CreateElement("Run");
-                XmlAttribute runPath = document.CreateAttribute("Key");
-                runPath.Value = run.Key;
-                runParent.Attributes.Append(runPath);
-                parent.AppendChild(runParent);
-            }
+            //hashCode ^= run.Key.GetHashCode();
+            //XmlNode runParent = null;
+            //if (document != null)
+            //{
+            //    runParent = document.CreateElement("Run");
+            //    XmlAttribute runPath = document.CreateAttribute("Key");
+            //    runPath.Value = run.Key;
+            //    runParent.Attributes.Append(runPath);
+            //    parent.AppendChild(runParent);
+            //}
 
-            foreach (KeyValuePair<int, RustAlarmSegmentSettings> segment in run.Value)
-            {
-                hashCode ^= segment.Key.GetHashCode();
-                XmlNode segmentParent = null;
-                if (document != null)
-                {
-                    segmentParent = document.CreateElement("Segment");
-                    XmlAttribute segmentName = document.CreateAttribute("Key");
-                    segmentName.Value = segment.Key.ToString();
-                    segmentParent.Attributes.Append(segmentName);
-                    runParent.AppendChild(segmentParent);
-                }
+            //foreach (KeyValuePair<int, RustAlarmSegment> segment in run.Value)
+            //{
+            //    hashCode ^= segment.Key.GetHashCode();
+            //    XmlNode segmentParent = null;
+            //    if (document != null)
+            //    {
+            //        segmentParent = document.CreateElement("Segment");
+            //        XmlAttribute segmentName = document.CreateAttribute("Key");
+            //        segmentName.Value = segment.Key.ToString();
+            //        segmentParent.Attributes.Append(segmentName);
+            //        runParent.AppendChild(segmentParent);
+            //    }
 
-                hashCode ^= segment.Value.RustThreshold.GetHashCode();
-                if (document != null)
-                {
-                    XmlNode rustThreshold = document.CreateElement("RustThreshold");
-                    XmlAttribute rustThresholdValue = document.CreateAttribute("Value");
-                    rustThresholdValue.Value = segment.Value.RustThreshold.ToString();
-                    rustThreshold.Attributes.Append(rustThresholdValue);
-                    segmentParent.AppendChild(rustThreshold);
-                }
-            }
+            //    hashCode ^= segment.Value.WarningThreshold.GetHashCode();
+            //    if (document != null)
+            //    {
+            //        XmlNode rustThreshold = document.CreateElement("RustThreshold");
+            //        XmlAttribute rustThresholdValue = document.CreateAttribute("Value");
+            //        rustThresholdValue.Value = segment.Value.WarningThreshold.ToString();
+            //        rustThreshold.Attributes.Append(rustThresholdValue);
+            //        segmentParent.AppendChild(rustThreshold);
+            //    }
+            //}
         }
         return hashCode;
     }
@@ -84,40 +94,55 @@ internal partial class RustAlarmSettings : UserControl
         if (settings is not XmlElement element)
             return;
 
-        foreach (XmlNode run in element.ChildNodes)
-        {
-            string runKey = run.Attributes["Key"].Value;
-            Dictionary<int, RustAlarmSegmentSettings> runSettings = GetOrCreateSettingsMap(runKey);
+        //foreach (XmlNode run in element.ChildNodes)
+        //{
+        //    string runKey = run.Attributes["Key"].Value;
+        //    Dictionary<int, RustAlarmSegment> segmentCache = GetOrCreateSegmentCache(runKey);
             
-            foreach (XmlNode segment in run.ChildNodes)
-            {
-                int segmentKey = int.Parse(segment.Attributes["Key"].Value);
-                RustAlarmSegmentSettings segmentSettings = GetOrCreateSegmentSettings(segmentKey, runSettings);
+        //    foreach (XmlNode segment in run.ChildNodes)
+        //    {
+        //        int segmentKey = int.Parse(segment.Attributes["Key"].Value);
+        //        RustAlarmSegment alarmSegment = GetOrCreateSegment(segmentKey, segmentCache);
 
-                XmlNode rustThreshold = segment["RustThreshold"];
-                if (int.TryParse(rustThreshold.Attributes["Value"].Value, out int threshold)) {
-                    segmentSettings.RustThreshold = threshold;
-                }
-            }
+        //        XmlNode rustThreshold = segment["WarningThreshold"];
+        //        if (int.TryParse(rustThreshold.Attributes["Value"].Value, out int threshold)) {
+        //            alarmSegment.WarningThreshold = threshold;
+        //        }
+        //    }
+        //}
+    }
+
+    private Dictionary<int, RustAlarmSegment> GetOrCreateSegmentCache(string runKey)
+    {
+        if (!_segmentCache.TryGetValue(runKey, out Dictionary<int, RustAlarmSegment> segmentCache))
+        {
+            segmentCache = [];
+            _segmentCache[runKey] = segmentCache;
         }
+        return segmentCache;
+    }
+
+    private RustAlarmSegment GetOrCreateSegment(int segmentKey, Dictionary<int, RustAlarmSegment> segmentCache)
+    {
+        if (!segmentCache.TryGetValue(segmentKey, out RustAlarmSegment alarmSegment))
+        {
+            alarmSegment = new RustAlarmSegment(this);
+            segmentCache[segmentKey] = alarmSegment;
+        }
+        return alarmSegment;
     }
 
     internal RustAlarmSegment GetOrCreateSegment(ISegment segment)
     {
-        Dictionary<int, RustAlarmSegment> segmentCache = SegmentCache();
-        int key = _idMapper.GetID(segment);
-        if (!segmentCache.TryGetValue(key, out RustAlarmSegment alarmSegment))
-        {
-            alarmSegment = new RustAlarmSegment(segment, GetOrCreateSegmentSettings(key, CurrentSettings()));
-            segmentCache[key] = alarmSegment;
-        }
+        RustAlarmSegment alarmSegment = GetOrCreateSegment(_idMapper.GetID(segment), SegmentCache());
+        alarmSegment.Segment = segment;
         return alarmSegment;
     }
 
     internal void CheckForNameChange(RustAlarmSegment segment)
     {
         string oldName = segment.UpdateName();
-        string newName = segment.Segment.Name;
+        string newName = segment.Name;
         if (oldName != newName)
         {
             _idMapper.Remap(oldName, newName);
@@ -129,27 +154,11 @@ internal partial class RustAlarmSettings : UserControl
         _currentRun = run;
         _idMapper.SetRun(run);
 
-        //tableLayoutSegments.Controls.Clear();
-        //tableLayoutSegments.RowCount = _currentRun.Count;
-        //Dictionary<int, RustAlarmSegmentSettings> runSettings = CurrentSettings();
-        //int i = 0;
-        //foreach (ISegment segment in _currentRun)
-        //{
-        //    RustAlarmSegmentSettings segmentSettings = GetOrCreateSegmentSettings(_idMapper.GetID(segment), runSettings);
-        //    tableLayoutSegments.Controls.Add(segmentSettings, 0, i++);
-        //    tableLayoutSegments.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-        //}
-        //Size = tableLayoutSegments.Size;
-    }
-
-    private RustAlarmSegmentSettings GetOrCreateSegmentSettings(int segmentKey, Dictionary<int, RustAlarmSegmentSettings> runSettings)
-    {
-        if (!runSettings.TryGetValue(segmentKey, out RustAlarmSegmentSettings settings))
+        _segmentsGridData.Clear();
+        foreach (ISegment segment in _currentRun)
         {
-            settings = new();
-            runSettings[segmentKey] = settings;
+            _segmentsGridData.Add(GetOrCreateSegment(segment));
         }
-        return settings;
     }
 
     private string Key(IRun run)
@@ -168,18 +177,48 @@ internal partial class RustAlarmSettings : UserControl
         return segmentCache;
     }
 
-    private Dictionary<int, RustAlarmSegmentSettings> GetOrCreateSettingsMap(string runKey)
+    private void dataGridSegments_CellEndEdit(object sender, DataGridViewCellEventArgs e)
     {
-        if (!_settings.TryGetValue(runKey, out Dictionary<int, RustAlarmSegmentSettings> runSettings))
-        {
-            runSettings = [];
-            _settings[runKey] = runSettings;
-        }
-        return runSettings;
+        dataGridSegments.Rows[e.RowIndex].Cells[e.ColumnIndex].ErrorText = String.Empty;
     }
 
-    private Dictionary<int, RustAlarmSegmentSettings> CurrentSettings()
+    private void dataGridSegments_CellValidated(object sender, DataGridViewCellEventArgs e)
     {
-        return GetOrCreateSettingsMap(Key(_currentRun));
+        if (dataGridSegments_DangerThreshold.Index == e.ColumnIndex || dataGridSegments_WarningThreshold.Index == e.ColumnIndex)
+        {
+            RustAlarmSegment segment = _segmentsGridData[e.RowIndex] as RustAlarmSegment;
+            if (segment.DangerThreshold <= segment.WarningThreshold)
+            {
+                segment.DangerThreshold = segment.WarningThreshold + 1;
+            }
+        }
+    }
+
+    private void dataGridSegments_CellValidating(object sender, DataGridViewCellValidatingEventArgs e)
+    {
+        DataGridViewCell cell = dataGridSegments.Rows[e.RowIndex].Cells[e.ColumnIndex];
+        if (dataGridSegments_FailRate.Index == e.ColumnIndex && (!decimal.TryParse(e.FormattedValue.ToString(), out decimal failRate) || failRate <= 0m || failRate >= 100m))
+        {
+            e.Cancel = true;
+        }
+        else if (dataGridSegments_MaxTimeLoss.Index == e.ColumnIndex)
+        {
+            try
+            {
+                TimeSpanParser.ParseNullable(e.FormattedValue.ToString());
+            } 
+            catch
+            {
+                e.Cancel = true;
+            }
+        }
+        else if (dataGridSegments_WarningThreshold.Index == e.ColumnIndex && (!int.TryParse(e.FormattedValue.ToString(), out int warningThreshold) || warningThreshold < 1))
+        {
+            e.Cancel = true;
+        }
+        else if (dataGridSegments_DangerThreshold.Index == e.ColumnIndex && (!int.TryParse(e.FormattedValue.ToString(), out int dangerThreshold) || dangerThreshold < 1))
+        {
+            e.Cancel = true;
+        }
     }
 }
