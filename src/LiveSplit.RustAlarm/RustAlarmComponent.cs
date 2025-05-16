@@ -152,7 +152,7 @@ public sealed class RustAlarmComponent : IComponent
                 _heading.RustCount++;
             }
         }
-        for (int i = 0; i <= _segmentIndex; i++)
+        for (int i = 0; i <= _segmentIndex && i < _segments.Count; i++)
         {
             _segments[i].RunEnded();
         }
