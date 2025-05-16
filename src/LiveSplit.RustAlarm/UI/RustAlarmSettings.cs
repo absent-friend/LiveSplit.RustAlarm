@@ -1,17 +1,70 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Windows.Forms;
 using System.Xml;
 using LiveSplit.Model;
+using LiveSplit.UI;
 
 namespace LiveSplit.RustAlarm.UI;
 
 internal partial class RustAlarmSettings : UserControl
 {
+    private static readonly Font DEFAULT_CUSTOM_FONT = new("Segoe UI", 16, FontStyle.Regular, GraphicsUnit.Pixel);
+
     private readonly RustAlarmIDMapper _idMapper;
     private readonly Dictionary<string, Dictionary<int, RustAlarmSegment>> _segmentCache;
     private readonly BindingSource _segmentsGridData;
     private IRun _currentRun;
+
+    public bool OverrideSegmentsFont { get; set; }
+
+    public Font SegmentsFont { get; set; } = DEFAULT_CUSTOM_FONT;
+
+    public string SegmentsFontString => SettingsHelper.FormatFont(SegmentsFont);
+
+    public bool OverrideSegmentsColor { get; set; }
+
+    public Color SegmentsColor { get; set; } = Color.White;
+
+    public Color WarningColor { get; set; } = Color.Yellow;
+
+    public Color DangerColor { get; set; } = Color.Red;
+
+    public bool OverrideTitleFont { get; set; }
+
+    public Font TitleFont { get; set; } = DEFAULT_CUSTOM_FONT;
+
+    public string TitleFontString => SettingsHelper.FormatFont(TitleFont);
+
+    public bool OverrideTitleColor { get; set; }
+
+    public Color TitleColor { get; set; } = Color.White;
+
+    public bool OverrideCountFont { get; set; }
+
+    public Font CountFont { get; set; } = DEFAULT_CUSTOM_FONT;
+
+    public string CountFontString => SettingsHelper.FormatFont(CountFont);
+
+    public bool OverrideCountColor { get; set; }
+
+    public Color CountColor { get; set; } = Color.White;
+
+    public Color BackgroundColor1 { get; set; } = Color.Transparent;
+
+    public Color BackgroundColor2 { get; set; } = Color.Transparent;
+
+    public GradientType BackgroundGradient { get; set; } = GradientType.Plain;
+
+    public string BackgroundGradientString
+    {
+        get => BackgroundGradient.ToString();
+        set
+        {
+            BackgroundGradient = (GradientType)Enum.Parse(typeof(GradientType), value);
+        }
+    }
 
     internal RustAlarmSettings()
     {
@@ -20,6 +73,37 @@ internal partial class RustAlarmSettings : UserControl
         _idMapper = new();
         _segmentCache = [];
         _segmentsGridData = [];
+
+        cmbBackgroundGradientType.Items.Add(GradientType.Plain.ToString());
+        cmbBackgroundGradientType.Items.Add(GradientType.Horizontal.ToString());
+        cmbBackgroundGradientType.Items.Add(GradientType.Vertical.ToString());
+
+        chkSegmentsFont.DataBindings.Add(nameof(chkSegmentsFont.Checked), this, nameof(OverrideSegmentsFont), false, DataSourceUpdateMode.OnPropertyChanged);
+        lblSegmentsFont.DataBindings.Add(nameof(lblSegmentsFont.Text), this, nameof(SegmentsFontString), false, DataSourceUpdateMode.OnPropertyChanged);
+        lblSegmentsFont.DataBindings.Add(nameof(lblSegmentsFont.Visible), this, nameof(OverrideSegmentsFont), true, DataSourceUpdateMode.OnPropertyChanged);
+        btnSegmentsFont.DataBindings.Add(nameof(btnSegmentsFont.Enabled), this, nameof(OverrideSegmentsFont), false, DataSourceUpdateMode.OnPropertyChanged);
+        chkSegmentsColor.DataBindings.Add(nameof(chkSegmentsColor.Checked), this, nameof(OverrideSegmentsColor), false, DataSourceUpdateMode.OnPropertyChanged);
+        btnSegmentsColor.DataBindings.Add(nameof(btnSegmentsColor.BackColor), this, nameof(SegmentsColor), false, DataSourceUpdateMode.OnPropertyChanged);
+        btnSegmentsColor.DataBindings.Add(nameof(btnSegmentsColor.Visible), this, nameof(OverrideSegmentsColor), false, DataSourceUpdateMode.OnPropertyChanged);
+        btnWarningColor.DataBindings.Add(nameof(btnWarningColor.BackColor), this, nameof(WarningColor), false, DataSourceUpdateMode.OnPropertyChanged);
+        btnDangerColor.DataBindings.Add(nameof(btnDangerColor.BackColor), this, nameof(DangerColor), false, DataSourceUpdateMode.OnPropertyChanged);
+        chkTitleFont.DataBindings.Add(nameof(chkTitleFont.Checked), this, nameof(OverrideTitleFont), false, DataSourceUpdateMode.OnPropertyChanged);
+        lblTitleFont.DataBindings.Add(nameof(lblTitleFont.Text), this, nameof(TitleFontString), false, DataSourceUpdateMode.OnPropertyChanged);
+        lblTitleFont.DataBindings.Add(nameof(lblTitleFont.Visible), this, nameof(OverrideTitleFont), false, DataSourceUpdateMode.OnPropertyChanged);
+        btnTitleFont.DataBindings.Add(nameof(btnTitleFont.Enabled), this, nameof(OverrideTitleFont), false, DataSourceUpdateMode.OnPropertyChanged);
+        chkTitleColor.DataBindings.Add(nameof(chkTitleColor.Checked), this, nameof(OverrideTitleColor), false, DataSourceUpdateMode.OnPropertyChanged);
+        btnTitleColor.DataBindings.Add(nameof(btnTitleColor.BackColor), this, nameof(TitleColor), false, DataSourceUpdateMode.OnPropertyChanged);
+        btnTitleColor.DataBindings.Add(nameof(btnTitleColor.Visible), this, nameof(OverrideTitleColor), false, DataSourceUpdateMode.OnPropertyChanged);
+        chkCountFont.DataBindings.Add(nameof(chkCountFont.Checked), this, nameof(OverrideCountFont), false, DataSourceUpdateMode.OnPropertyChanged);
+        lblCountFont.DataBindings.Add(nameof(lblCountFont.Text), this, nameof(CountFontString), false, DataSourceUpdateMode.OnPropertyChanged);
+        lblCountFont.DataBindings.Add(nameof(lblCountFont.Visible), this, nameof(OverrideCountFont), false, DataSourceUpdateMode.OnPropertyChanged);
+        btnCountFont.DataBindings.Add(nameof(btnCountFont.Enabled), this, nameof(OverrideCountFont), false, DataSourceUpdateMode.OnPropertyChanged);
+        chkCountColor.DataBindings.Add(nameof(chkCountColor.Checked), this, nameof(OverrideCountColor), false, DataSourceUpdateMode.OnPropertyChanged);
+        btnCountColor.DataBindings.Add(nameof(btnCountColor.BackColor), this, nameof(CountColor), false, DataSourceUpdateMode.OnPropertyChanged);
+        btnCountColor.DataBindings.Add(nameof(btnCountColor.Visible), this, nameof(OverrideCountColor), false, DataSourceUpdateMode.OnPropertyChanged);
+        btnBackgroundColor1.DataBindings.Add(nameof(btnBackgroundColor1.BackColor), this, nameof(BackgroundColor1), false, DataSourceUpdateMode.OnPropertyChanged);
+        btnBackgroundColor2.DataBindings.Add(nameof(btnBackgroundColor2.BackColor), this, nameof(BackgroundColor2), false, DataSourceUpdateMode.OnPropertyChanged);
+        cmbBackgroundGradientType.DataBindings.Add(nameof(cmbBackgroundGradientType.SelectedItem), this, nameof(BackgroundGradientString), false, DataSourceUpdateMode.OnPropertyChanged);
 
         dataGridSegments.AutoGenerateColumns = false;
         dataGridSegments.DataSource = _segmentsGridData;
@@ -220,5 +304,42 @@ internal partial class RustAlarmSettings : UserControl
         {
             e.Cancel = true;
         }
+    }
+
+    private void btnSegmentsFont_Click(object sender, EventArgs e)
+    {
+        CustomFontDialog.FontDialog dialog = SettingsHelper.GetFontDialog(SegmentsFont, 11, 26);
+        dialog.FontChanged += (s, ev) => SegmentsFont = ((CustomFontDialog.FontChangedEventArgs)ev).NewFont;
+        dialog.ShowDialog(this);
+        lblSegmentsFont.Text = SegmentsFontString;
+    }
+
+    private void btnTitleFont_Click(object sender, EventArgs e)
+    {
+        CustomFontDialog.FontDialog dialog = SettingsHelper.GetFontDialog(TitleFont, 11, 26);
+        dialog.FontChanged += (s, ev) => TitleFont = ((CustomFontDialog.FontChangedEventArgs)ev).NewFont;
+        dialog.ShowDialog(this);
+        lblTitleFont.Text = TitleFontString;
+    }
+
+    private void btnCountFont_Click(object sender, EventArgs e)
+    {
+        CustomFontDialog.FontDialog dialog = SettingsHelper.GetFontDialog(CountFont, 11, 26);
+        dialog.FontChanged += (s, ev) => CountFont = ((CustomFontDialog.FontChangedEventArgs)ev).NewFont;
+        dialog.ShowDialog(this);
+        lblCountFont.Text = CountFontString;
+    }
+
+    private void ColorButtonClick(object sender, EventArgs e)
+    {
+        SettingsHelper.ColorButtonClick((Button)sender, this);
+    }
+
+    private void cmbBackgroundGradientType_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        btnBackgroundColor1.Visible = cmbBackgroundGradientType.SelectedItem.ToString() != GradientType.Plain.ToString();
+        btnBackgroundColor2.DataBindings.Clear();
+        string backColorBindProperty = btnBackgroundColor1.Visible ? nameof(BackgroundColor2) : nameof(BackgroundColor1);
+        btnBackgroundColor2.DataBindings.Add(nameof(btnBackgroundColor2.BackColor), this, backColorBindProperty, false, DataSourceUpdateMode.OnPropertyChanged);
     }
 }

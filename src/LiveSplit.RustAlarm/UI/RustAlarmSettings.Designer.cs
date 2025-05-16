@@ -47,9 +47,9 @@ partial class RustAlarmSettings
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
-            this.cmbGradientType = new System.Windows.Forms.ComboBox();
-            this.btnBackgroundColor2 = new System.Windows.Forms.Button();
+            this.cmbBackgroundGradientType = new System.Windows.Forms.ComboBox();
             this.btnBackgroundColor1 = new System.Windows.Forms.Button();
+            this.btnBackgroundColor2 = new System.Windows.Forms.Button();
             this.btnWarningColor = new System.Windows.Forms.Button();
             this.btnDangerColor = new System.Windows.Forms.Button();
             this.chkCountFont = new System.Windows.Forms.CheckBox();
@@ -129,12 +129,12 @@ partial class RustAlarmSettings
             tableLayoutBackground.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             tableLayoutBackground.ColumnCount = 4;
             tableLayoutBackground.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 159F));
-            tableLayoutBackground.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            tableLayoutBackground.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            tableLayoutBackground.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 29F));
+            tableLayoutBackground.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 29F));
             tableLayoutBackground.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 253F));
-            tableLayoutBackground.Controls.Add(this.cmbGradientType, 3, 0);
-            tableLayoutBackground.Controls.Add(this.btnBackgroundColor2, 1, 0);
-            tableLayoutBackground.Controls.Add(this.btnBackgroundColor1, 2, 0);
+            tableLayoutBackground.Controls.Add(this.cmbBackgroundGradientType, 3, 0);
+            tableLayoutBackground.Controls.Add(this.btnBackgroundColor1, 1, 0);
+            tableLayoutBackground.Controls.Add(this.btnBackgroundColor2, 2, 0);
             tableLayoutBackground.Controls.Add(lblBackgroundColor, 0, 0);
             tableLayoutBackground.Dock = System.Windows.Forms.DockStyle.Fill;
             tableLayoutBackground.Location = new System.Drawing.Point(3, 513);
@@ -144,38 +144,41 @@ partial class RustAlarmSettings
             tableLayoutBackground.Size = new System.Drawing.Size(470, 29);
             tableLayoutBackground.TabIndex = 0;
             // 
-            // cmbGradientType
+            // cmbBackgroundGradientType
             // 
-            this.cmbGradientType.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.cmbGradientType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cmbGradientType.FormattingEnabled = true;
-            this.cmbGradientType.Location = new System.Drawing.Point(220, 4);
-            this.cmbGradientType.Name = "cmbGradientType";
-            this.cmbGradientType.Size = new System.Drawing.Size(247, 21);
-            this.cmbGradientType.TabIndex = 0;
-            // 
-            // btnBackgroundColor2
-            // 
-            this.btnBackgroundColor2.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.btnBackgroundColor2.BackColor = System.Drawing.Color.Transparent;
-            this.btnBackgroundColor2.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.btnBackgroundColor2.Location = new System.Drawing.Point(162, 3);
-            this.btnBackgroundColor2.Name = "btnBackgroundColor2";
-            this.btnBackgroundColor2.Size = new System.Drawing.Size(23, 23);
-            this.btnBackgroundColor2.TabIndex = 1;
-            this.btnBackgroundColor2.UseVisualStyleBackColor = false;
-            this.btnBackgroundColor2.Visible = false;
+            this.cmbBackgroundGradientType.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.cmbBackgroundGradientType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbBackgroundGradientType.FormattingEnabled = true;
+            this.cmbBackgroundGradientType.Location = new System.Drawing.Point(220, 4);
+            this.cmbBackgroundGradientType.Name = "cmbBackgroundGradientType";
+            this.cmbBackgroundGradientType.Size = new System.Drawing.Size(247, 21);
+            this.cmbBackgroundGradientType.TabIndex = 0;
+            this.cmbBackgroundGradientType.SelectedIndexChanged += new System.EventHandler(this.cmbBackgroundGradientType_SelectedIndexChanged);
             // 
             // btnBackgroundColor1
             // 
             this.btnBackgroundColor1.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.btnBackgroundColor1.BackColor = System.Drawing.Color.Transparent;
             this.btnBackgroundColor1.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.btnBackgroundColor1.Location = new System.Drawing.Point(191, 3);
+            this.btnBackgroundColor1.Location = new System.Drawing.Point(162, 3);
             this.btnBackgroundColor1.Name = "btnBackgroundColor1";
             this.btnBackgroundColor1.Size = new System.Drawing.Size(23, 23);
-            this.btnBackgroundColor1.TabIndex = 2;
+            this.btnBackgroundColor1.TabIndex = 1;
             this.btnBackgroundColor1.UseVisualStyleBackColor = false;
+            this.btnBackgroundColor1.Visible = false;
+            this.btnBackgroundColor1.Click += new System.EventHandler(this.ColorButtonClick);
+            // 
+            // btnBackgroundColor2
+            // 
+            this.btnBackgroundColor2.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.btnBackgroundColor2.BackColor = System.Drawing.Color.Transparent;
+            this.btnBackgroundColor2.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.btnBackgroundColor2.Location = new System.Drawing.Point(191, 3);
+            this.btnBackgroundColor2.Name = "btnBackgroundColor2";
+            this.btnBackgroundColor2.Size = new System.Drawing.Size(23, 23);
+            this.btnBackgroundColor2.TabIndex = 2;
+            this.btnBackgroundColor2.UseVisualStyleBackColor = false;
+            this.btnBackgroundColor2.Click += new System.EventHandler(this.ColorButtonClick);
             // 
             // lblBackgroundColor
             // 
@@ -228,6 +231,7 @@ partial class RustAlarmSettings
             this.btnWarningColor.Size = new System.Drawing.Size(23, 23);
             this.btnWarningColor.TabIndex = 7;
             this.btnWarningColor.UseVisualStyleBackColor = false;
+            this.btnWarningColor.Click += new System.EventHandler(this.ColorButtonClick);
             // 
             // lblWarningColor
             // 
@@ -259,6 +263,7 @@ partial class RustAlarmSettings
             this.btnDangerColor.Size = new System.Drawing.Size(23, 23);
             this.btnDangerColor.TabIndex = 6;
             this.btnDangerColor.UseVisualStyleBackColor = false;
+            this.btnDangerColor.Click += new System.EventHandler(this.ColorButtonClick);
             // 
             // groupBoxHeading
             // 
@@ -314,7 +319,7 @@ partial class RustAlarmSettings
             tableLayoutCount.Name = "tableLayoutCount";
             tableLayoutCount.RowCount = 2;
             tableLayoutCount.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            tableLayoutCount.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            tableLayoutCount.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 29F));
             tableLayoutCount.Size = new System.Drawing.Size(452, 58);
             tableLayoutCount.TabIndex = 0;
             // 
@@ -359,18 +364,19 @@ partial class RustAlarmSettings
             this.btnCountFont.TabIndex = 4;
             this.btnCountFont.Text = "Choose...";
             this.btnCountFont.UseVisualStyleBackColor = true;
+            this.btnCountFont.Click += new System.EventHandler(this.btnCountFont_Click);
             // 
             // btnCountColor
             // 
             this.btnCountColor.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.btnCountColor.BackColor = System.Drawing.Color.White;
-            this.btnCountColor.Enabled = false;
             this.btnCountColor.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.btnCountColor.Location = new System.Drawing.Point(62, 32);
             this.btnCountColor.Name = "btnCountColor";
             this.btnCountColor.Size = new System.Drawing.Size(23, 23);
             this.btnCountColor.TabIndex = 5;
             this.btnCountColor.UseVisualStyleBackColor = false;
+            this.btnCountColor.Click += new System.EventHandler(this.ColorButtonClick);
             // 
             // groupTitle
             // 
@@ -400,7 +406,7 @@ partial class RustAlarmSettings
             tableLayoutTitle.Name = "tableLayoutTitle";
             tableLayoutTitle.RowCount = 2;
             tableLayoutTitle.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            tableLayoutTitle.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            tableLayoutTitle.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 29F));
             tableLayoutTitle.Size = new System.Drawing.Size(452, 57);
             tableLayoutTitle.TabIndex = 0;
             // 
@@ -445,18 +451,19 @@ partial class RustAlarmSettings
             this.btnTitleFont.TabIndex = 4;
             this.btnTitleFont.Text = "Choose...";
             this.btnTitleFont.UseVisualStyleBackColor = true;
+            this.btnTitleFont.Click += new System.EventHandler(this.btnTitleFont_Click);
             // 
             // btnTitleColor
             // 
             this.btnTitleColor.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.btnTitleColor.BackColor = System.Drawing.Color.White;
-            this.btnTitleColor.Enabled = false;
             this.btnTitleColor.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.btnTitleColor.Location = new System.Drawing.Point(62, 32);
             this.btnTitleColor.Name = "btnTitleColor";
             this.btnTitleColor.Size = new System.Drawing.Size(23, 23);
             this.btnTitleColor.TabIndex = 5;
             this.btnTitleColor.UseVisualStyleBackColor = false;
+            this.btnTitleColor.Click += new System.EventHandler(this.ColorButtonClick);
             // 
             // groupSegments
             // 
@@ -486,7 +493,7 @@ partial class RustAlarmSettings
             tableLayoutSegments.RowCount = 3;
             tableLayoutSegments.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             tableLayoutSegments.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            tableLayoutSegments.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            tableLayoutSegments.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 29F));
             tableLayoutSegments.Size = new System.Drawing.Size(464, 239);
             tableLayoutSegments.TabIndex = 0;
             // 
@@ -494,13 +501,13 @@ partial class RustAlarmSettings
             // 
             this.btnSegmentsColor.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.btnSegmentsColor.BackColor = System.Drawing.Color.White;
-            this.btnSegmentsColor.Enabled = false;
             this.btnSegmentsColor.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.btnSegmentsColor.Location = new System.Drawing.Point(62, 213);
             this.btnSegmentsColor.Name = "btnSegmentsColor";
             this.btnSegmentsColor.Size = new System.Drawing.Size(23, 23);
             this.btnSegmentsColor.TabIndex = 7;
             this.btnSegmentsColor.UseVisualStyleBackColor = false;
+            this.btnSegmentsColor.Click += new System.EventHandler(this.ColorButtonClick);
             // 
             // chkSegmentsColor
             // 
@@ -523,6 +530,7 @@ partial class RustAlarmSettings
             this.btnSegmentsFont.TabIndex = 5;
             this.btnSegmentsFont.Text = "Choose...";
             this.btnSegmentsFont.UseVisualStyleBackColor = true;
+            this.btnSegmentsFont.Click += new System.EventHandler(this.btnSegmentsFont_Click);
             // 
             // lblSegmentsFont
             // 
@@ -660,9 +668,9 @@ partial class RustAlarmSettings
     }
 
     #endregion
-    private System.Windows.Forms.ComboBox cmbGradientType;
-    private System.Windows.Forms.Button btnBackgroundColor2;
+    private System.Windows.Forms.ComboBox cmbBackgroundGradientType;
     private System.Windows.Forms.Button btnBackgroundColor1;
+    private System.Windows.Forms.Button btnBackgroundColor2;
     private System.Windows.Forms.CheckBox chkTitleFont;
     private System.Windows.Forms.CheckBox chkTitleColor;
     private System.Windows.Forms.Label lblTitleFont;
