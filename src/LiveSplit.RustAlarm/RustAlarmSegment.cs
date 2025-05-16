@@ -20,18 +20,18 @@ namespace LiveSplit.RustAlarm
         {
             AutomaticPrecision = true,
         };
-        private static readonly Brush WARNING_COLOR = new SolidBrush(Color.Yellow);
 
         private ISegment _segment;
         private string _name;
         private decimal _failRate;
         private TimeSpan? _maxTimeLoss;
-        private int _previousFailureCount;
-        private int _failureCount;
-        private bool _newlyRusty;
+        private int _previousFailureStreak;
+        private int _failureStreak;
         private readonly RustAlarmSettings _settings;
         private readonly SimpleLabel _nameLabel;
         private readonly GraphicsCache _cache;
+
+        internal EventHandler OnThresholdChange;
 
         internal ISegment Segment {
             get => _segment;
@@ -111,11 +111,42 @@ namespace LiveSplit.RustAlarm
 
         public int DangerThreshold { get; set; } = 7;
 
+        private Color RustColor {
+            get
+            {
+                if (_failureStreak >= DangerThreshold)
+                {
+                    return _settings.DangerColor;
+                }
+                else if (_failureStreak > WarningThreshold)
+                {
+                    return Interpolate(_settings.WarningColor, _settings.DangerColor);
+                }
+                else if (_failureStreak ==  WarningThreshold)
+                {
+                    return _settings.WarningColor;
+                }
+                else
+                {
+                    return Color.Transparent;
+                }
+            }
+        }
+
+        private Color Interpolate(Color start, Color end)
+        {
+            decimal t = (_failureStreak - WarningThreshold) / (decimal)(DangerThreshold - WarningThreshold);
+            return Color.FromArgb(
+                (int)((1 - t) * start.A + t * end.A),
+                (int)((1 - t) * start.R + t * end.R),
+                (int)((1 - t) * start.G + t * end.G),
+                (int)((1 - t) * start.B + t * end.B));
+        }
+
         internal RustAlarmSegment(RustAlarmSettings settings)
         {
             _failRate = 50m;
-            _failureCount = 0;
-            _newlyRusty = false;
+            _failureStreak = 0;
             _settings = settings;
             _nameLabel = new();
             _cache = new();
@@ -125,37 +156,46 @@ namespace LiveSplit.RustAlarm
 
         internal bool Reset()
         {
-            bool wasClean = !IsRusty();
-            _failureCount++;
+            bool wasRusty = IsRusty();
+            _failureStreak++;
             bool isRusty = IsRusty();
-            _newlyRusty = wasClean && isRusty;
-            return _newlyRusty;
+            return !wasRusty && isRusty;
         }
 
         internal bool Split()
         {
+            (bool wasRusty, bool isRusty) = Split(null);
+            return wasRusty && !isRusty;
+        }
+
+        internal (bool, bool) Split(TimeSpan? delta)
+        {
             bool wasRusty = IsRusty();
-            _failureCount = 0;
-            bool isClean = !IsRusty();
-            return wasRusty && isClean;
+            if (delta != null && _maxTimeLoss != null && delta > _maxTimeLoss)
+            {
+                _failureStreak++;
+            }
+            else if (_maxTimeLoss == null || delta <= _maxTimeLoss)
+            {
+                _failureStreak = 0;
+            }
+            bool isRusty = IsRusty();
+            return (wasRusty, isRusty);
         }
 
         internal void Undo()
         {
-            bool wasClean = !IsRusty();
-            _failureCount = _previousFailureCount;
-            bool isRusty = IsRusty();
-            _newlyRusty = wasClean && isRusty;
+            _failureStreak = _previousFailureStreak;
         }
 
         internal void RunEnded()
         {
-            _previousFailureCount = _failureCount;
+            _previousFailureStreak = _failureStreak;
         }
 
         internal bool IsRusty()
         {
-            return _failureCount >= WarningThreshold;
+            return _failureStreak >= WarningThreshold;
         }
 
         internal string UpdateName()
@@ -168,8 +208,8 @@ namespace LiveSplit.RustAlarm
 
         private void PrepareDraw(LiveSplitState state, LayoutMode mode)
         {
-            _nameLabel.Font = state.LayoutSettings.TextFont;
-            _nameLabel.ForeColor = state.LayoutSettings.TextColor;
+            _nameLabel.Font = _settings.OverrideSegmentsFont ? _settings.SegmentsFont : state.LayoutSettings.TextFont;
+            _nameLabel.ForeColor = _settings.OverrideSegmentsColor ? _settings.SegmentsColor : state.LayoutSettings.TextColor;
             _nameLabel.OutlineColor = state.LayoutSettings.TextOutlineColor;
             _nameLabel.ShadowColor = state.LayoutSettings.ShadowsColor;
 
@@ -195,7 +235,7 @@ namespace LiveSplit.RustAlarm
             _nameLabel.Draw(g);
 
             float warningSize = textHeight * 0.65f;
-            g.FillRectangle(WARNING_COLOR, HorizontalWidth - PaddingRight - warningSize, height - textHeight, warningSize, warningSize);
+            g.FillRectangle(new SolidBrush(RustColor), HorizontalWidth - PaddingRight - warningSize, height - textHeight, warningSize, warningSize);
         }
 
         public void DrawVertical(Graphics g, LiveSplitState state, float width, Region clipRegion)
@@ -215,17 +255,16 @@ namespace LiveSplit.RustAlarm
             _nameLabel.Y = 0;
 
             _nameLabel.Draw(g);
-            g.FillRectangle(WARNING_COLOR, width - PaddingRight - textHeight, VerticalHeight - PaddingBottom - textHeight, textHeight, textHeight);
+            g.FillRectangle(new SolidBrush(RustColor), width - PaddingRight - textHeight, VerticalHeight - PaddingBottom - textHeight, textHeight, textHeight);
         }
 
         public void Update(IInvalidator invalidator, LiveSplitState state, float width, float height, LayoutMode mode)
         {
             _cache.Restart();
-            _cache["NameText"] = _nameLabel.Text;
-            if (invalidator != null && (_cache.HasChanged || _newlyRusty))
+            _cache["RustColor"] = RustColor;
+            if (invalidator != null && _cache.HasChanged)
             {
                 invalidator.Invalidate(0, 0, width, height);
-                _newlyRusty = false;
             }
         }
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Windows.Forms;
 using System.Xml;
@@ -20,12 +21,11 @@ public sealed class RustAlarmComponent : IComponent
     private readonly RustAlarmSettings _settings;
     private readonly Stack<IRustAlarmEvent> _eventStack;
     private readonly ComponentRendererComponent _componentRenderer;
-    private readonly InfoTextComponent _heading;
+    private readonly RustAlarmHeading _heading;
     private IRun _currentRun;
     private List<RustAlarmSegment> _segments;
     private int _skipStart;
     private int _segmentIndex;
-    private int _rustCount;
 
     public RustAlarmComponent(LiveSplitState state)
     {
@@ -33,7 +33,7 @@ public sealed class RustAlarmComponent : IComponent
         _settings = new();
         _eventStack = new();
         _componentRenderer = new();
-        _heading = new("Rusty Segments", "-");
+        _heading = new("Rusty Segments", "-", _settings);
         SetRun(state.Run);
         SetUpEventListeners();
     }
@@ -92,27 +92,33 @@ public sealed class RustAlarmComponent : IComponent
         return _settings;
     }
 
-    private void PrepareDraw(LiveSplitState state)
+    private void DrawBackground(Graphics g, float width, float height)
     {
-        _heading.NameLabel.Font = state.LayoutSettings.TextFont;
-        _heading.NameLabel.ForeColor = state.LayoutSettings.TextColor;
-        _heading.NameLabel.OutlineColor = state.LayoutSettings.TextOutlineColor;
-        _heading.NameLabel.ShadowColor = state.LayoutSettings.ShadowsColor;
-        _heading.ValueLabel.Font = state.LayoutSettings.TextFont;
-        _heading.ValueLabel.ForeColor = state.LayoutSettings.TextColor;
-        _heading.ValueLabel.OutlineColor = state.LayoutSettings.TextOutlineColor;
-        _heading.ValueLabel.ShadowColor = state.LayoutSettings.ShadowsColor;
+        // ripped from LiveSplit.Text's TextComponent
+        if (_settings.BackgroundColor1.A > 0 || (_settings.BackgroundGradient != GradientType.Plain && _settings.BackgroundColor2.A > 0))
+        {
+            var gradientBrush = new LinearGradientBrush(
+                        new PointF(0, 0),
+                        _settings.BackgroundGradient == GradientType.Horizontal
+                        ? new PointF(width, 0)
+                        : new PointF(0, height),
+                        _settings.BackgroundColor1,
+                        _settings.BackgroundGradient == GradientType.Plain
+                        ? _settings.BackgroundColor1
+                        : _settings.BackgroundColor2);
+            g.FillRectangle(gradientBrush, 0, 0, width, height);
+        }
     }
 
     public void DrawHorizontal(Graphics g, LiveSplitState state, float height, Region clipRegion)
     {
-        PrepareDraw(state);
+        DrawBackground(g, HorizontalWidth, height);
         _componentRenderer.DrawHorizontal(g, state, height, clipRegion);
     }
 
     public void DrawVertical(Graphics g, LiveSplitState state, float width, Region clipRegion)
     {
-        PrepareDraw(state);
+        DrawBackground(g, width, VerticalHeight);
         _componentRenderer.DrawVertical(g, state, width, clipRegion);
     }
 
@@ -143,8 +149,7 @@ public sealed class RustAlarmComponent : IComponent
             bool newlyRusty = _segments[_segmentIndex].Reset();
             if (newlyRusty)
             {
-                _rustCount++;
-                SetHeadingText();
+                _heading.RustCount++;
             }
         }
         for (int i = 0; i <= _segmentIndex; i++)
@@ -176,23 +181,59 @@ public sealed class RustAlarmComponent : IComponent
         _eventStack.Push(skip);
     }
 
+    private TimeSpan? TimeLostOrGainedToBest()
+    {
+        // It's assumed that both the previous split and the current one were not skipped. Don't call this in a situation that would violate those assumptions.
+        TimeSpan? segment;
+        if (_segmentIndex == 0)
+        {
+            segment = _currentRun[_segmentIndex].SplitTime[_state.CurrentTimingMethod];
+        }
+        else
+        {
+            TimeSpan? split = _currentRun[_segmentIndex].SplitTime[_state.CurrentTimingMethod];
+            TimeSpan? previousSplit = _currentRun[_segmentIndex - 1].SplitTime[_state.CurrentTimingMethod];
+            segment = split - previousSplit;
+        }
+
+        TimeSpan? bestSegment = _currentRun[_segmentIndex].BestSegmentTime[_state.CurrentTimingMethod];
+        return segment - bestSegment;
+    }
+
     class SplitEvent(RustAlarmComponent component) : IRustAlarmEvent
     {
         private readonly int _skipStart = component._skipStart;
         private readonly int _segmentIndex = component._segmentIndex;
-        private readonly int _rustCount = component._rustCount;
+        private readonly int _rustCount = component._heading.RustCount;
 
         public void Apply()
         {
-            for (int i = _skipStart; i <= _segmentIndex; i++)
+            if (_skipStart == _segmentIndex)
             {
-                bool newlyClean = component._segments[i].Split();
-                if (newlyClean)
+                TimeSpan? deltaGold = component.TimeLostOrGainedToBest();
+                (bool wasRusty, bool isRusty) = component._segments[_segmentIndex].Split(deltaGold);
+                if (wasRusty && !isRusty)
                 {
-                    component._rustCount--;
+                    component._heading.RustCount--;
+                }
+                else if (!wasRusty && isRusty)
+                {
+                    component._heading.RustCount++;
                 }
             }
-            component.SetHeadingText();
+            else
+            {
+                int noLongerRusty = 0;
+                for (int i = _skipStart; i <= _segmentIndex; i++)
+                {
+                    bool newlyClean = component._segments[i].Split();
+                    if (newlyClean)
+                    {
+                        noLongerRusty++;
+                    }
+                }
+                component._heading.RustCount -= noLongerRusty;
+            }
             component._segmentIndex++;
             component._skipStart = component._segmentIndex;
         }
@@ -201,13 +242,12 @@ public sealed class RustAlarmComponent : IComponent
         {
             component._segmentIndex = _segmentIndex;
             component._skipStart = _skipStart;
-            component._rustCount = _rustCount;
+            component._heading.RustCount = _rustCount;
 
             for (int i = _skipStart; i <= _segmentIndex; i++)
             {
                 component._segments[i].Undo();
             }
-            component.SetHeadingText();
         }
     }
 
@@ -222,11 +262,6 @@ public sealed class RustAlarmComponent : IComponent
     {
         // Undo won't fire if it's attempted on the first segment of the run, so we don't need to check count.
         _eventStack.Pop().Undo();
-    }
-
-    private void SetHeadingText()
-    {
-        _heading.ValueLabel.Text = _rustCount == 0 ? "-" : _rustCount.ToString();
     }
 
     private void _state_RunManuallyModified(object sender, EventArgs e)
@@ -278,8 +313,8 @@ public sealed class RustAlarmComponent : IComponent
             // Leftover segments were deleted in the splits editor.
             _segments.RemoveRange(i, _segments.Count - i);
         }
-        _rustCount = _segments.Where(segment => segment.IsRusty()).Count();
-        SetHeadingText();
+        SetUpSegmentListeners();
+        RefreshRustCount();
     }
 
     private void SetRun(IRun run)
@@ -293,7 +328,26 @@ public sealed class RustAlarmComponent : IComponent
             .Where(segment => segment.IsRusty())
             .Cast<IComponent>()
             .Prepend(_heading);
-        _rustCount = _segments.Where(segment => segment.IsRusty()).Count();
-        SetHeadingText();
+        SetUpSegmentListeners();
+        RefreshRustCount();
+    }
+
+    private void SetUpSegmentListeners()
+    {
+        foreach (RustAlarmSegment segment in _segments)
+        {
+            segment.OnThresholdChange -= OnThresholdChange;
+            segment.OnThresholdChange += OnThresholdChange;
+        }
+    }
+
+    private void OnThresholdChange(object sender, EventArgs e)
+    {
+        RefreshRustCount();
+    }
+
+    private void RefreshRustCount()
+    {
+        _heading.RustCount = _segments.Where(segment => segment.IsRusty()).Count();
     }
 }

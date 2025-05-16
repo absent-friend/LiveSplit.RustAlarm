@@ -275,6 +275,7 @@ internal partial class RustAlarmSettings : UserControl
             {
                 segment.DangerThreshold = segment.WarningThreshold + 1;
             }
+            segment.OnThresholdChange.Invoke(null, null);
         }
     }
 
