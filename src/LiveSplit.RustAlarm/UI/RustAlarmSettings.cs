@@ -10,6 +10,7 @@ namespace LiveSplit.RustAlarm.UI;
 
 internal partial class RustAlarmSettings : UserControl
 {
+    internal static readonly Version VERSION = new Version(0, 5);
     private static readonly Font DEFAULT_CUSTOM_FONT = new("Segoe UI", 16, FontStyle.Regular, GraphicsUnit.Pixel);
 
     private readonly RustAlarmIDMapper _idMapper;
@@ -130,45 +131,43 @@ internal partial class RustAlarmSettings : UserControl
         return BuildSettingsXML(null, null);
     }
 
-    private int BuildSettingsXML(XmlDocument document, XmlNode parent)
+    private int BuildSettingsXML(XmlDocument document, XmlElement parent)
     {
-        int hashCode = 0;
+        int hashCode = SettingsHelper.CreateSetting(document, parent, "Version", VERSION) 
+                ^ SettingsHelper.CreateSetting(document, parent, "OverrideSegmentsFont", OverrideSegmentsFont)
+                ^ SettingsHelper.CreateSetting(document, parent, "SegmentsFont", SegmentsFont)
+                ^ SettingsHelper.CreateSetting(document, parent, "OverrideSegmentsColor", OverrideSegmentsColor)
+                ^ SettingsHelper.CreateSetting(document, parent, "SegmentsColor", SegmentsColor)
+                ^ SettingsHelper.CreateSetting(document, parent, "WarningColor", WarningColor)
+                ^ SettingsHelper.CreateSetting(document, parent, "DangerColor", DangerColor)
+                ^ SettingsHelper.CreateSetting(document, parent, "OverrideTitleFont", OverrideTitleFont)
+                ^ SettingsHelper.CreateSetting(document, parent, "TitleFont", TitleFont)
+                ^ SettingsHelper.CreateSetting(document, parent, "OverrideTitleColor", OverrideTitleColor)
+                ^ SettingsHelper.CreateSetting(document, parent, "TitleColor", TitleColor)
+                ^ SettingsHelper.CreateSetting(document, parent, "OverrideCountFont", OverrideCountFont)
+                ^ SettingsHelper.CreateSetting(document, parent, "CountFont", CountFont)
+                ^ SettingsHelper.CreateSetting(document, parent, "OverrideCountColor", OverrideCountColor)
+                ^ SettingsHelper.CreateSetting(document, parent, "CountColor", CountColor)
+                ^ SettingsHelper.CreateSetting(document, parent, "BackgroundColor1", BackgroundColor1)
+                ^ SettingsHelper.CreateSetting(document, parent, "BackgroundColor2", BackgroundColor2)
+                ^ SettingsHelper.CreateSetting(document, parent, "BackgroundGradient", BackgroundGradient);
+
         foreach (KeyValuePair<string, Dictionary<int, RustAlarmSegment>> run in _segmentCache)
         {
-            //hashCode ^= run.Key.GetHashCode();
-            //XmlNode runParent = null;
-            //if (document != null)
-            //{
-            //    runParent = document.CreateElement("Run");
-            //    XmlAttribute runPath = document.CreateAttribute("Key");
-            //    runPath.Value = run.Key;
-            //    runParent.Attributes.Append(runPath);
-            //    parent.AppendChild(runParent);
-            //}
+            XmlElement runParent = document?.CreateElement("Run");
+            parent?.AppendChild(runParent);
+            hashCode ^= SettingsHelper.CreateSetting(document, runParent, "Key", run.Key);
 
-            //foreach (KeyValuePair<int, RustAlarmSegment> segment in run.Value)
-            //{
-            //    hashCode ^= segment.Key.GetHashCode();
-            //    XmlNode segmentParent = null;
-            //    if (document != null)
-            //    {
-            //        segmentParent = document.CreateElement("Segment");
-            //        XmlAttribute segmentName = document.CreateAttribute("Key");
-            //        segmentName.Value = segment.Key.ToString();
-            //        segmentParent.Attributes.Append(segmentName);
-            //        runParent.AppendChild(segmentParent);
-            //    }
-
-            //    hashCode ^= segment.Value.WarningThreshold.GetHashCode();
-            //    if (document != null)
-            //    {
-            //        XmlNode rustThreshold = document.CreateElement("RustThreshold");
-            //        XmlAttribute rustThresholdValue = document.CreateAttribute("Value");
-            //        rustThresholdValue.Value = segment.Value.WarningThreshold.ToString();
-            //        rustThreshold.Attributes.Append(rustThresholdValue);
-            //        segmentParent.AppendChild(rustThreshold);
-            //    }
-            //}
+            foreach (KeyValuePair<int, RustAlarmSegment> segment in run.Value)
+            {
+                XmlElement segmentParent = document?.CreateElement("Segment");
+                runParent?.AppendChild(segmentParent);
+                hashCode ^= SettingsHelper.CreateSetting(document, segmentParent, "Key", segment.Key)
+                    ^ SettingsHelper.CreateSetting(document, segmentParent, "FailRate", segment.Value.FailRate)
+                    ^ SettingsHelper.CreateSetting(document, segmentParent, "WarningThreshold", segment.Value.WarningThreshold)
+                    ^ SettingsHelper.CreateSetting(document, segmentParent, "DangerThreshold", segment.Value.DangerThreshold)
+                    ^ SettingsHelper.CreateSetting(document, segmentParent, "MaxTimeLoss", segment.Value.MaxTimeLossString);
+            }
         }
         return hashCode;
     }
@@ -178,22 +177,49 @@ internal partial class RustAlarmSettings : UserControl
         if (settings is not XmlElement element)
             return;
 
-        //foreach (XmlNode run in element.ChildNodes)
-        //{
-        //    string runKey = run.Attributes["Key"].Value;
-        //    Dictionary<int, RustAlarmSegment> segmentCache = GetOrCreateSegmentCache(runKey);
-            
-        //    foreach (XmlNode segment in run.ChildNodes)
-        //    {
-        //        int segmentKey = int.Parse(segment.Attributes["Key"].Value);
-        //        RustAlarmSegment alarmSegment = GetOrCreateSegment(segmentKey, segmentCache);
+        OverrideSegmentsFont = SettingsHelper.ParseBool(element["OverrideSegmentsFont"]);
+        SegmentsFont = SettingsHelper.GetFontFromElement(element["SegmentsFont"]);
+        OverrideSegmentsColor = SettingsHelper.ParseBool(element["OverrideSegmentsColor"]);
+        SegmentsColor = SettingsHelper.ParseColor(element["SegmentsColor"]);
+        WarningColor = SettingsHelper.ParseColor(element["WarningColor"]);
+        DangerColor = SettingsHelper.ParseColor(element["DangerColor"]);
+        OverrideTitleFont = SettingsHelper.ParseBool(element["OverrideTitleFont"]);
+        TitleFont = SettingsHelper.GetFontFromElement(element["TitleFont"]);
+        OverrideTitleColor = SettingsHelper.ParseBool(element["OverrideTitleColor"]);
+        TitleColor = SettingsHelper.ParseColor(element["TitleColor"]);
+        OverrideCountFont = SettingsHelper.ParseBool(element["OverrideCountFont"]);
+        CountFont = SettingsHelper.GetFontFromElement(element["CountFont"]);
+        OverrideCountColor = SettingsHelper.ParseBool(element["OverrideCountColor"]);
+        CountColor = SettingsHelper.ParseColor(element["CountColor"]);
+        BackgroundColor1 = SettingsHelper.ParseColor(element["BackgroundColor1"]);
+        BackgroundColor2 = SettingsHelper.ParseColor(element["BackgroundColor2"]);
+        BackgroundGradient = SettingsHelper.ParseEnum<GradientType>(element["BackgroundGradient"]);
 
-        //        XmlNode rustThreshold = segment["WarningThreshold"];
-        //        if (int.TryParse(rustThreshold.Attributes["Value"].Value, out int threshold)) {
-        //            alarmSegment.WarningThreshold = threshold;
-        //        }
-        //    }
-        //}
+        XmlNode run = element["Run"];
+        while (run != null)
+        {
+            string runKey = SettingsHelper.ParseString(run["Key"]);
+            Dictionary<int, RustAlarmSegment> segmentCache = GetOrCreateSegmentCache(runKey);
+
+            XmlNode segment = run["Segment"];
+            while (segment != null)
+            {
+                int segmentKey = SettingsHelper.ParseInt(segment["Key"]);
+                RustAlarmSegment alarmSegment = GetOrCreateSegment(segmentKey, segmentCache);
+                string failRateString = SettingsHelper.ParseString(segment["FailRate"]);
+                if (decimal.TryParse(failRateString, out decimal failRate))
+                {
+                    alarmSegment.FailRate = failRate;
+                }
+                alarmSegment.WarningThreshold = SettingsHelper.ParseInt(segment["WarningThreshold"]);
+                alarmSegment.DangerThreshold = SettingsHelper.ParseInt(segment["DangerThreshold"]);
+                alarmSegment.MaxTimeLossString = SettingsHelper.ParseString(segment["MaxTimeLoss"]);
+
+                segment = segment.NextSibling;
+            }
+
+            run = run.NextSibling;
+        }
     }
 
     private Dictionary<int, RustAlarmSegment> GetOrCreateSegmentCache(string runKey)
