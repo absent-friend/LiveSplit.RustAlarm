@@ -315,6 +315,7 @@ public sealed class RustAlarmComponent : IComponent
         }
         SetUpSegmentListeners();
         RefreshRustCount();
+        _settings.RebuildSegmentsGrid();
     }
 
     private void SetRun(IRun run)

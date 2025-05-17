@@ -263,7 +263,11 @@ internal partial class RustAlarmSettings : UserControl
     {
         _currentRun = run;
         _idMapper.SetRun(run);
+        RebuildSegmentsGrid();
+    }
 
+    internal void RebuildSegmentsGrid()
+    {
         _segmentsGridData.Clear();
         foreach (ISegment segment in _currentRun)
         {
