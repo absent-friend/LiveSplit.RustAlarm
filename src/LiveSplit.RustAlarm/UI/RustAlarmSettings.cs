@@ -85,7 +85,7 @@ internal partial class RustAlarmSettings : UserControl
         btnSegmentsFont.DataBindings.Add(nameof(btnSegmentsFont.Enabled), this, nameof(OverrideSegmentsFont), false, DataSourceUpdateMode.OnPropertyChanged);
         chkSegmentsColor.DataBindings.Add(nameof(chkSegmentsColor.Checked), this, nameof(OverrideSegmentsColor), false, DataSourceUpdateMode.OnPropertyChanged);
         btnSegmentsColor.DataBindings.Add(nameof(btnSegmentsColor.BackColor), this, nameof(SegmentsColor), false, DataSourceUpdateMode.OnPropertyChanged);
-        btnSegmentsColor.DataBindings.Add(nameof(btnSegmentsColor.Visible), this, nameof(OverrideSegmentsColor), false, DataSourceUpdateMode.OnPropertyChanged);
+        btnSegmentsColor.DataBindings.Add(nameof(btnSegmentsColor.Enabled), this, nameof(OverrideSegmentsColor), false, DataSourceUpdateMode.OnPropertyChanged);
         btnWarningColor.DataBindings.Add(nameof(btnWarningColor.BackColor), this, nameof(WarningColor), false, DataSourceUpdateMode.OnPropertyChanged);
         btnDangerColor.DataBindings.Add(nameof(btnDangerColor.BackColor), this, nameof(DangerColor), false, DataSourceUpdateMode.OnPropertyChanged);
         chkTitleFont.DataBindings.Add(nameof(chkTitleFont.Checked), this, nameof(OverrideTitleFont), false, DataSourceUpdateMode.OnPropertyChanged);
@@ -94,14 +94,14 @@ internal partial class RustAlarmSettings : UserControl
         btnTitleFont.DataBindings.Add(nameof(btnTitleFont.Enabled), this, nameof(OverrideTitleFont), false, DataSourceUpdateMode.OnPropertyChanged);
         chkTitleColor.DataBindings.Add(nameof(chkTitleColor.Checked), this, nameof(OverrideTitleColor), false, DataSourceUpdateMode.OnPropertyChanged);
         btnTitleColor.DataBindings.Add(nameof(btnTitleColor.BackColor), this, nameof(TitleColor), false, DataSourceUpdateMode.OnPropertyChanged);
-        btnTitleColor.DataBindings.Add(nameof(btnTitleColor.Visible), this, nameof(OverrideTitleColor), false, DataSourceUpdateMode.OnPropertyChanged);
+        btnTitleColor.DataBindings.Add(nameof(btnTitleColor.Enabled), this, nameof(OverrideTitleColor), false, DataSourceUpdateMode.OnPropertyChanged);
         chkCountFont.DataBindings.Add(nameof(chkCountFont.Checked), this, nameof(OverrideCountFont), false, DataSourceUpdateMode.OnPropertyChanged);
         lblCountFont.DataBindings.Add(nameof(lblCountFont.Text), this, nameof(CountFontString), false, DataSourceUpdateMode.OnPropertyChanged);
         lblCountFont.DataBindings.Add(nameof(lblCountFont.Enabled), this, nameof(OverrideCountFont), false, DataSourceUpdateMode.OnPropertyChanged);
         btnCountFont.DataBindings.Add(nameof(btnCountFont.Enabled), this, nameof(OverrideCountFont), false, DataSourceUpdateMode.OnPropertyChanged);
         chkCountColor.DataBindings.Add(nameof(chkCountColor.Checked), this, nameof(OverrideCountColor), false, DataSourceUpdateMode.OnPropertyChanged);
         btnCountColor.DataBindings.Add(nameof(btnCountColor.BackColor), this, nameof(CountColor), false, DataSourceUpdateMode.OnPropertyChanged);
-        btnCountColor.DataBindings.Add(nameof(btnCountColor.Visible), this, nameof(OverrideCountColor), false, DataSourceUpdateMode.OnPropertyChanged);
+        btnCountColor.DataBindings.Add(nameof(btnCountColor.Enabled), this, nameof(OverrideCountColor), false, DataSourceUpdateMode.OnPropertyChanged);
         btnBackgroundColor1.DataBindings.Add(nameof(btnBackgroundColor1.BackColor), this, nameof(BackgroundColor1), false, DataSourceUpdateMode.OnPropertyChanged);
         btnBackgroundColor2.DataBindings.Add(nameof(btnBackgroundColor2.BackColor), this, nameof(BackgroundColor2), false, DataSourceUpdateMode.OnPropertyChanged);
         cmbBackgroundGradientType.DataBindings.Add(nameof(cmbBackgroundGradientType.SelectedItem), this, nameof(BackgroundGradientString), false, DataSourceUpdateMode.OnPropertyChanged);
@@ -363,5 +363,11 @@ internal partial class RustAlarmSettings : UserControl
         btnBackgroundColor2.DataBindings.Clear();
         string backColorBindProperty = btnBackgroundColor1.Visible ? nameof(BackgroundColor2) : nameof(BackgroundColor1);
         btnBackgroundColor2.DataBindings.Add(nameof(btnBackgroundColor2.BackColor), this, backColorBindProperty, false, DataSourceUpdateMode.OnPropertyChanged);
+    }
+
+    private void FontOrColorBoxChecked(object sender, EventArgs e)
+    {
+        CheckBox checkBox = (CheckBox)sender;
+        checkBox.ForeColor = checkBox.Checked ? SystemColors.ControlText : SystemColors.GrayText;
     }
 }

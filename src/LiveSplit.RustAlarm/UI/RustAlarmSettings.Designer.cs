@@ -43,10 +43,10 @@ partial class RustAlarmSettings
             System.Windows.Forms.TableLayoutPanel tableLayoutTitle;
             System.Windows.Forms.GroupBox groupSegments;
             System.Windows.Forms.TableLayoutPanel tableLayoutSegments;
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
             this.cmbBackgroundGradientType = new System.Windows.Forms.ComboBox();
             this.btnBackgroundColor1 = new System.Windows.Forms.Button();
             this.btnBackgroundColor2 = new System.Windows.Forms.Button();
@@ -198,7 +198,7 @@ partial class RustAlarmSettings
             groupThresholdColors.Size = new System.Drawing.Size(470, 48);
             groupThresholdColors.TabIndex = 2;
             groupThresholdColors.TabStop = false;
-            groupThresholdColors.Text = "Threshold Colors";
+            groupThresholdColors.Text = "Rust Colors";
             // 
             // tableLayoutThresholds
             // 
@@ -327,23 +327,27 @@ partial class RustAlarmSettings
             // 
             this.chkCountFont.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.chkCountFont.AutoSize = true;
+            this.chkCountFont.ForeColor = System.Drawing.SystemColors.GrayText;
             this.chkCountFont.Location = new System.Drawing.Point(3, 6);
             this.chkCountFont.Name = "chkCountFont";
             this.chkCountFont.Size = new System.Drawing.Size(50, 17);
             this.chkCountFont.TabIndex = 0;
             this.chkCountFont.Text = "Font:";
             this.chkCountFont.UseVisualStyleBackColor = true;
+            this.chkCountFont.CheckedChanged += new System.EventHandler(this.FontOrColorBoxChecked);
             // 
             // chkCountColor
             // 
             this.chkCountColor.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.chkCountColor.AutoSize = true;
+            this.chkCountColor.ForeColor = System.Drawing.SystemColors.GrayText;
             this.chkCountColor.Location = new System.Drawing.Point(3, 35);
             this.chkCountColor.Name = "chkCountColor";
             this.chkCountColor.Size = new System.Drawing.Size(53, 17);
             this.chkCountColor.TabIndex = 1;
             this.chkCountColor.Text = "Color:";
             this.chkCountColor.UseVisualStyleBackColor = true;
+            this.chkCountColor.CheckedChanged += new System.EventHandler(this.FontOrColorBoxChecked);
             // 
             // lblCountFont
             // 
@@ -414,23 +418,27 @@ partial class RustAlarmSettings
             // 
             this.chkTitleFont.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.chkTitleFont.AutoSize = true;
+            this.chkTitleFont.ForeColor = System.Drawing.SystemColors.GrayText;
             this.chkTitleFont.Location = new System.Drawing.Point(3, 6);
             this.chkTitleFont.Name = "chkTitleFont";
             this.chkTitleFont.Size = new System.Drawing.Size(50, 17);
             this.chkTitleFont.TabIndex = 0;
             this.chkTitleFont.Text = "Font:";
             this.chkTitleFont.UseVisualStyleBackColor = true;
+            this.chkTitleFont.CheckedChanged += new System.EventHandler(this.FontOrColorBoxChecked);
             // 
             // chkTitleColor
             // 
             this.chkTitleColor.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.chkTitleColor.AutoSize = true;
+            this.chkTitleColor.ForeColor = System.Drawing.SystemColors.GrayText;
             this.chkTitleColor.Location = new System.Drawing.Point(3, 35);
             this.chkTitleColor.Name = "chkTitleColor";
             this.chkTitleColor.Size = new System.Drawing.Size(53, 17);
             this.chkTitleColor.TabIndex = 1;
             this.chkTitleColor.Text = "Color:";
             this.chkTitleColor.UseVisualStyleBackColor = true;
+            this.chkTitleColor.CheckedChanged += new System.EventHandler(this.FontOrColorBoxChecked);
             // 
             // lblTitleFont
             // 
@@ -513,12 +521,14 @@ partial class RustAlarmSettings
             // 
             this.chkSegmentsColor.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.chkSegmentsColor.AutoSize = true;
+            this.chkSegmentsColor.ForeColor = System.Drawing.SystemColors.GrayText;
             this.chkSegmentsColor.Location = new System.Drawing.Point(3, 216);
             this.chkSegmentsColor.Name = "chkSegmentsColor";
             this.chkSegmentsColor.Size = new System.Drawing.Size(53, 17);
             this.chkSegmentsColor.TabIndex = 6;
             this.chkSegmentsColor.Text = "Color:";
             this.chkSegmentsColor.UseVisualStyleBackColor = true;
+            this.chkSegmentsColor.CheckedChanged += new System.EventHandler(this.FontOrColorBoxChecked);
             // 
             // btnSegmentsFont
             // 
@@ -545,12 +555,14 @@ partial class RustAlarmSettings
             // 
             this.chkSegmentsFont.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.chkSegmentsFont.AutoSize = true;
+            this.chkSegmentsFont.ForeColor = System.Drawing.SystemColors.GrayText;
             this.chkSegmentsFont.Location = new System.Drawing.Point(3, 187);
             this.chkSegmentsFont.Name = "chkSegmentsFont";
             this.chkSegmentsFont.Size = new System.Drawing.Size(50, 17);
             this.chkSegmentsFont.TabIndex = 1;
             this.chkSegmentsFont.Text = "Font:";
             this.chkSegmentsFont.UseVisualStyleBackColor = true;
+            this.chkSegmentsFont.CheckedChanged += new System.EventHandler(this.FontOrColorBoxChecked);
             // 
             // dataGridSegments
             // 
@@ -588,8 +600,8 @@ partial class RustAlarmSettings
             // 
             // dataGridSegments_FailRate
             // 
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.dataGridSegments_FailRate.DefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.dataGridSegments_FailRate.DefaultCellStyle = dataGridViewCellStyle5;
             this.dataGridSegments_FailRate.HeaderText = "Fail %";
             this.dataGridSegments_FailRate.Name = "dataGridSegments_FailRate";
             this.dataGridSegments_FailRate.Resizable = System.Windows.Forms.DataGridViewTriState.False;
@@ -599,8 +611,8 @@ partial class RustAlarmSettings
             // 
             // dataGridSegments_WarningThreshold
             // 
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.dataGridSegments_WarningThreshold.DefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.dataGridSegments_WarningThreshold.DefaultCellStyle = dataGridViewCellStyle6;
             this.dataGridSegments_WarningThreshold.HeaderText = "Warning #";
             this.dataGridSegments_WarningThreshold.Name = "dataGridSegments_WarningThreshold";
             this.dataGridSegments_WarningThreshold.Resizable = System.Windows.Forms.DataGridViewTriState.False;
@@ -611,8 +623,8 @@ partial class RustAlarmSettings
             // 
             // dataGridSegments_DangerThreshold
             // 
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.dataGridSegments_DangerThreshold.DefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.dataGridSegments_DangerThreshold.DefaultCellStyle = dataGridViewCellStyle7;
             this.dataGridSegments_DangerThreshold.HeaderText = "Danger #";
             this.dataGridSegments_DangerThreshold.Name = "dataGridSegments_DangerThreshold";
             this.dataGridSegments_DangerThreshold.Resizable = System.Windows.Forms.DataGridViewTriState.False;
@@ -623,8 +635,8 @@ partial class RustAlarmSettings
             // 
             // dataGridSegments_MaxTimeLoss
             // 
-            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
-            this.dataGridSegments_MaxTimeLoss.DefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleRight;
+            this.dataGridSegments_MaxTimeLoss.DefaultCellStyle = dataGridViewCellStyle8;
             this.dataGridSegments_MaxTimeLoss.HeaderText = "Max Time Loss";
             this.dataGridSegments_MaxTimeLoss.Name = "dataGridSegments_MaxTimeLoss";
             this.dataGridSegments_MaxTimeLoss.Resizable = System.Windows.Forms.DataGridViewTriState.False;
