@@ -56,8 +56,6 @@ public sealed class RustAlarmComponent : IComponent
 
     public float PaddingRight => _componentRenderer.PaddingRight;
 
-    public IDictionary<string, Action> ContextMenuControls => null;
-
     public void Update(IInvalidator invalidator, LiveSplitState state, float width, float height, LayoutMode mode)
     {
         if (_currentRun != state.Run)
@@ -350,5 +348,34 @@ public sealed class RustAlarmComponent : IComponent
     private void RefreshRustCount()
     {
         _heading.RustCount = _segments.Where(segment => segment.IsRusty()).Count();
+    }
+
+    public IDictionary<string, Action> ContextMenuControls
+    {
+        get
+        {
+            Dictionary<string, Action> contextControls = [];
+            contextControls["Clear All Rusty Segments"] = ClearRustySegments;
+            foreach (RustAlarmSegment segment in _segments.Where(s => s.IsRusty()))
+            {
+                contextControls["Clear Rust for " + segment.Name] = () => ClearRust(segment);
+            }
+            return contextControls;
+        }
+    }
+
+    private void ClearRustySegments()
+    {
+        foreach (RustAlarmSegment segment in _segments.Where(s => s.IsRusty()))
+        {
+            segment.ClearRust();
+        }
+        _heading.RustCount = 0;
+    }
+
+    private void ClearRust(RustAlarmSegment segment)
+    {
+        segment.ClearRust();
+        _heading.RustCount--;
     }
 }

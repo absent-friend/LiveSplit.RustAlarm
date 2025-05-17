@@ -198,6 +198,11 @@ namespace LiveSplit.RustAlarm
             return _failureStreak >= WarningThreshold;
         }
 
+        internal void ClearRust()
+        {
+            _failureStreak = 0;
+        }
+
         internal string UpdateName()
         {
             string oldName = _name;
