@@ -69,13 +69,18 @@ namespace LiveSplit.RustAlarm
             }
         }
 
-        public decimal FailRate {
-            get => _failRate; 
+        public string FailRateString
+        {
+            get => _failRate > 0m ? _failRate.ToString() : "";
             set
             {
-                if (_failRate != value)
+                if (!decimal.TryParse(value, out decimal failRate))
                 {
-                    _failRate = value;
+                    _failRate = 0m;
+                }
+                else if (_failRate != failRate)
+                {
+                    _failRate = failRate;
                     int streak = 1;
                     decimal failOdds = _failRate / 100m;
                     decimal streakOdds = failOdds;
@@ -92,7 +97,7 @@ namespace LiveSplit.RustAlarm
                     }
                     DangerThreshold = streak;
                 }
-            } 
+            }
         }
 
         public string MaxTimeLossString
@@ -107,9 +112,9 @@ namespace LiveSplit.RustAlarm
             }
         }
 
-        public int WarningThreshold { get; set; } = 4;
+        public int WarningThreshold { get; set; } = 2;
 
-        public int DangerThreshold { get; set; } = 7;
+        public int DangerThreshold { get; set; } = 4;
 
         private Color RustColor {
             get
@@ -145,7 +150,6 @@ namespace LiveSplit.RustAlarm
 
         internal RustAlarmSegment(RustAlarmSettings settings)
         {
-            _failRate = 50m;
             _failureStreak = 0;
             _settings = settings;
             _nameLabel = new();

@@ -10,7 +10,7 @@ namespace LiveSplit.RustAlarm.UI;
 
 internal partial class RustAlarmSettings : UserControl
 {
-    internal static readonly Version VERSION = new Version(0, 5);
+    internal static readonly Version VERSION = new(0, 5);
     private static readonly Font DEFAULT_CUSTOM_FONT = new("Segoe UI", 16, FontStyle.Regular, GraphicsUnit.Pixel);
 
     private readonly RustAlarmIDMapper _idMapper;
@@ -109,12 +109,11 @@ internal partial class RustAlarmSettings : UserControl
         dataGridSegments.AutoGenerateColumns = false;
         dataGridSegments.DataSource = _segmentsGridData;
         dataGridSegments_Name.DataPropertyName = "Name";
-        dataGridSegments_FailRate.DataPropertyName = "FailRate";
+        dataGridSegments_FailRate.DataPropertyName = "FailRateString";
         dataGridSegments_MaxTimeLoss.DataPropertyName = "MaxTimeLossString";
         dataGridSegments_WarningThreshold.DataPropertyName = "WarningThreshold";
         dataGridSegments_DangerThreshold.DataPropertyName = "DangerThreshold";
         
-        dataGridSegments.CellEndEdit += dataGridSegments_CellEndEdit;
         dataGridSegments.CellValidated += dataGridSegments_CellValidated;
         dataGridSegments.CellValidating += dataGridSegments_CellValidating;
     }
@@ -163,7 +162,7 @@ internal partial class RustAlarmSettings : UserControl
                 XmlElement segmentParent = document?.CreateElement("Segment");
                 runParent?.AppendChild(segmentParent);
                 hashCode ^= SettingsHelper.CreateSetting(document, segmentParent, "Key", segment.Key)
-                    ^ SettingsHelper.CreateSetting(document, segmentParent, "FailRate", segment.Value.FailRate)
+                    ^ SettingsHelper.CreateSetting(document, segmentParent, "FailRate", segment.Value.FailRateString)
                     ^ SettingsHelper.CreateSetting(document, segmentParent, "WarningThreshold", segment.Value.WarningThreshold)
                     ^ SettingsHelper.CreateSetting(document, segmentParent, "DangerThreshold", segment.Value.DangerThreshold)
                     ^ SettingsHelper.CreateSetting(document, segmentParent, "MaxTimeLoss", segment.Value.MaxTimeLossString);
@@ -206,11 +205,7 @@ internal partial class RustAlarmSettings : UserControl
             {
                 int segmentKey = SettingsHelper.ParseInt(segment["Key"]);
                 RustAlarmSegment alarmSegment = GetOrCreateSegment(segmentKey, segmentCache);
-                string failRateString = SettingsHelper.ParseString(segment["FailRate"]);
-                if (decimal.TryParse(failRateString, out decimal failRate))
-                {
-                    alarmSegment.FailRate = failRate;
-                }
+                alarmSegment.FailRateString = SettingsHelper.ParseString(segment["FailRate"]);
                 alarmSegment.WarningThreshold = SettingsHelper.ParseInt(segment["WarningThreshold"]);
                 alarmSegment.DangerThreshold = SettingsHelper.ParseInt(segment["DangerThreshold"]);
                 alarmSegment.MaxTimeLossString = SettingsHelper.ParseString(segment["MaxTimeLoss"]);
@@ -291,11 +286,6 @@ internal partial class RustAlarmSettings : UserControl
         return segmentCache;
     }
 
-    private void dataGridSegments_CellEndEdit(object sender, DataGridViewCellEventArgs e)
-    {
-        dataGridSegments.Rows[e.RowIndex].Cells[e.ColumnIndex].ErrorText = String.Empty;
-    }
-
     private void dataGridSegments_CellValidated(object sender, DataGridViewCellEventArgs e)
     {
         if (dataGridSegments_DangerThreshold.Index == e.ColumnIndex || dataGridSegments_WarningThreshold.Index == e.ColumnIndex)
@@ -311,8 +301,9 @@ internal partial class RustAlarmSettings : UserControl
 
     private void dataGridSegments_CellValidating(object sender, DataGridViewCellValidatingEventArgs e)
     {
-        DataGridViewCell cell = dataGridSegments.Rows[e.RowIndex].Cells[e.ColumnIndex];
-        if (dataGridSegments_FailRate.Index == e.ColumnIndex && (!decimal.TryParse(e.FormattedValue.ToString(), out decimal failRate) || failRate <= 0m || failRate >= 100m))
+        if (dataGridSegments_FailRate.Index == e.ColumnIndex
+            && !string.IsNullOrWhiteSpace(e.FormattedValue.ToString())
+            && (!decimal.TryParse(e.FormattedValue.ToString(), out decimal failRate) || failRate <= 0m || failRate >= 100m))
         {
             e.Cancel = true;
         }
