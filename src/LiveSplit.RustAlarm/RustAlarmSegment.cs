@@ -6,6 +6,7 @@ using LiveSplit.UI.Components;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using System.Xml;
 
@@ -20,9 +21,9 @@ namespace LiveSplit.RustAlarm
         {
             AutomaticPrecision = true,
         };
+        private static readonly Regex SUBSPLIT_REGEX = new(@"^{(?<parent>.+)}\s*(?<split>.+)$", RegexOptions.Compiled);
 
         private ISegment _segment;
-        private string _name;
         private decimal _failRate;
         private TimeSpan? _maxTimeLoss;
         private int _previousFailureStreak;
@@ -59,15 +60,11 @@ namespace LiveSplit.RustAlarm
 
         public float PaddingLeft => 7f;
 
-        public float PaddingRight => 7f; 
-        
-        public string Name {
-            get => _name;
-            private set
-            {
-                _name = value;
-            }
-        }
+        public float PaddingRight => 7f;
+
+        public string Name { get; private set; }
+
+        public string DisplayName => CleanName();
 
         public string FailRateString
         {
@@ -209,10 +206,23 @@ namespace LiveSplit.RustAlarm
 
         internal string UpdateName()
         {
-            string oldName = _name;
-            _name = Segment.Name;
-            _nameLabel.Text = Name;
+            string oldName = Name;
+            Name = Segment.Name;
+            _nameLabel.Text = CleanName();
             return oldName;
+        }
+
+        private string CleanName()
+        {
+            Match subsplitMatch = SUBSPLIT_REGEX.Match(Name);
+            if (subsplitMatch.Success)
+            {
+                return subsplitMatch.Groups["split"].Value;
+            }
+            else
+            {
+                return Name[1..];
+            }
         }
 
         private void PrepareDraw(LiveSplitState state, LayoutMode mode)

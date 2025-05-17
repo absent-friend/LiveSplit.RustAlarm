@@ -108,7 +108,7 @@ internal partial class RustAlarmSettings : UserControl
 
         dataGridSegments.AutoGenerateColumns = false;
         dataGridSegments.DataSource = _segmentsGridData;
-        dataGridSegments_Name.DataPropertyName = "Name";
+        dataGridSegments_Name.DataPropertyName = "DisplayName";
         dataGridSegments_FailRate.DataPropertyName = "FailRateString";
         dataGridSegments_MaxTimeLoss.DataPropertyName = "MaxTimeLossString";
         dataGridSegments_WarningThreshold.DataPropertyName = "WarningThreshold";
