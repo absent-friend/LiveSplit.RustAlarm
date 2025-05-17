@@ -370,4 +370,9 @@ internal partial class RustAlarmSettings : UserControl
         CheckBox checkBox = (CheckBox)sender;
         checkBox.ForeColor = checkBox.Checked ? SystemColors.ControlText : SystemColors.GrayText;
     }
+
+    private void linkSettingsGuide_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+    {
+        System.Diagnostics.Process.Start("https://github.com/absent-friend/LiveSplit.RustAlarm/wiki/Settings-Guide");
+    }
 }
