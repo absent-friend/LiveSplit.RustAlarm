@@ -32,7 +32,7 @@ namespace LiveSplit.RustAlarm
             {
                 foreach (ISegment segment in run)
                 {
-                    _map[segment.Name] = _maxId++;
+                    _map[segment.Name] = ++_maxId;
                 }
                 SaveToFile();
             }
@@ -42,7 +42,7 @@ namespace LiveSplit.RustAlarm
         {
             if (!_map.TryGetValue(segment.Name, out int id))
             {
-                id = _maxId++;
+                id = ++_maxId;
                 _map[segment.Name] = id;
                 SaveToFile();
             }
