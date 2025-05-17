@@ -81,7 +81,7 @@ internal partial class RustAlarmSettings : UserControl
 
         chkSegmentsFont.DataBindings.Add(nameof(chkSegmentsFont.Checked), this, nameof(OverrideSegmentsFont), false, DataSourceUpdateMode.OnPropertyChanged);
         lblSegmentsFont.DataBindings.Add(nameof(lblSegmentsFont.Text), this, nameof(SegmentsFontString), false, DataSourceUpdateMode.OnPropertyChanged);
-        lblSegmentsFont.DataBindings.Add(nameof(lblSegmentsFont.Visible), this, nameof(OverrideSegmentsFont), true, DataSourceUpdateMode.OnPropertyChanged);
+        lblSegmentsFont.DataBindings.Add(nameof(lblSegmentsFont.Enabled), this, nameof(OverrideSegmentsFont), true, DataSourceUpdateMode.OnPropertyChanged);
         btnSegmentsFont.DataBindings.Add(nameof(btnSegmentsFont.Enabled), this, nameof(OverrideSegmentsFont), false, DataSourceUpdateMode.OnPropertyChanged);
         chkSegmentsColor.DataBindings.Add(nameof(chkSegmentsColor.Checked), this, nameof(OverrideSegmentsColor), false, DataSourceUpdateMode.OnPropertyChanged);
         btnSegmentsColor.DataBindings.Add(nameof(btnSegmentsColor.BackColor), this, nameof(SegmentsColor), false, DataSourceUpdateMode.OnPropertyChanged);
@@ -90,14 +90,14 @@ internal partial class RustAlarmSettings : UserControl
         btnDangerColor.DataBindings.Add(nameof(btnDangerColor.BackColor), this, nameof(DangerColor), false, DataSourceUpdateMode.OnPropertyChanged);
         chkTitleFont.DataBindings.Add(nameof(chkTitleFont.Checked), this, nameof(OverrideTitleFont), false, DataSourceUpdateMode.OnPropertyChanged);
         lblTitleFont.DataBindings.Add(nameof(lblTitleFont.Text), this, nameof(TitleFontString), false, DataSourceUpdateMode.OnPropertyChanged);
-        lblTitleFont.DataBindings.Add(nameof(lblTitleFont.Visible), this, nameof(OverrideTitleFont), false, DataSourceUpdateMode.OnPropertyChanged);
+        lblTitleFont.DataBindings.Add(nameof(lblTitleFont.Enabled), this, nameof(OverrideTitleFont), false, DataSourceUpdateMode.OnPropertyChanged);
         btnTitleFont.DataBindings.Add(nameof(btnTitleFont.Enabled), this, nameof(OverrideTitleFont), false, DataSourceUpdateMode.OnPropertyChanged);
         chkTitleColor.DataBindings.Add(nameof(chkTitleColor.Checked), this, nameof(OverrideTitleColor), false, DataSourceUpdateMode.OnPropertyChanged);
         btnTitleColor.DataBindings.Add(nameof(btnTitleColor.BackColor), this, nameof(TitleColor), false, DataSourceUpdateMode.OnPropertyChanged);
         btnTitleColor.DataBindings.Add(nameof(btnTitleColor.Visible), this, nameof(OverrideTitleColor), false, DataSourceUpdateMode.OnPropertyChanged);
         chkCountFont.DataBindings.Add(nameof(chkCountFont.Checked), this, nameof(OverrideCountFont), false, DataSourceUpdateMode.OnPropertyChanged);
         lblCountFont.DataBindings.Add(nameof(lblCountFont.Text), this, nameof(CountFontString), false, DataSourceUpdateMode.OnPropertyChanged);
-        lblCountFont.DataBindings.Add(nameof(lblCountFont.Visible), this, nameof(OverrideCountFont), false, DataSourceUpdateMode.OnPropertyChanged);
+        lblCountFont.DataBindings.Add(nameof(lblCountFont.Enabled), this, nameof(OverrideCountFont), false, DataSourceUpdateMode.OnPropertyChanged);
         btnCountFont.DataBindings.Add(nameof(btnCountFont.Enabled), this, nameof(OverrideCountFont), false, DataSourceUpdateMode.OnPropertyChanged);
         chkCountColor.DataBindings.Add(nameof(chkCountColor.Checked), this, nameof(OverrideCountColor), false, DataSourceUpdateMode.OnPropertyChanged);
         btnCountColor.DataBindings.Add(nameof(btnCountColor.BackColor), this, nameof(CountColor), false, DataSourceUpdateMode.OnPropertyChanged);
