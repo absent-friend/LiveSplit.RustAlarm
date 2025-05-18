@@ -21,7 +21,7 @@ Rust Alarm can be used as-is, but I recommend reading the [settings guide](https
 
 You should also be aware of these [warnings and caveats](https://github.com/absent-friend/LiveSplit.RustAlarm/wiki/3.-Warnings-and-Caveats).
 
-If you have LiveSplit in your recording layout, you might not want to show Rust Alarm in the recording. I've written up some [recommendations for recording LiveSplit](https://github.com/absent-friend/LiveSplit.RustAlarm/wiki/4.-Recording-LiveSplit-with-Rust-Alarm) with this in mind.
+If you have LiveSplit in your recording layout, you might not want to show Rust Alarm in the recording. I've written up some [recommendations for recording LiveSplit](https://github.com/absent-friend/LiveSplit.RustAlarm/wiki/4.-Excluding-Rust-Alarm-from-a-LiveSplit-Capture) with this in mind.
 
 ## Development
 
