@@ -10,7 +10,7 @@ namespace LiveSplit.RustAlarm.UI;
 
 internal partial class RustAlarmSettings : UserControl
 {
-    internal static readonly Version VERSION = new(0, 5);
+    internal static readonly Version VERSION = new(0, 8, 0);
     private static readonly Font DEFAULT_CUSTOM_FONT = new("Segoe UI", 16, FontStyle.Regular, GraphicsUnit.Pixel);
 
     private readonly RustAlarmIDMapper _idMapper;

@@ -1,16 +1,16 @@
 <updates>
 
   <!-- Applied only when `version` is greater than `RustAlarmFactory.Version`. -->
-  <update version="0.0.0">
+  <update version="0.8.0">
     <files>
       <!-- Path to the updated file relative to `RustAlarmFactory.UpdateURL`. -->
       <!-- Possible values for `status` are: `added`, `changed`, `removed`. -->
-      <file path="Components/LiveSplit.RustAlarm.dll" status="changed"/>
+      <file path="/v0.8.0/LiveSplit.RustAlarm.dll" status="added"/>
     </files>
 
     <!-- Bullet point list of changes in this update. -->
     <changelog>
-      <change>Added a sample feature</change>
+      <change>Initial release.</change>
     </changelog>
   </update>
 
