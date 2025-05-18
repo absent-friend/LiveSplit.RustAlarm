@@ -33,7 +33,7 @@ public sealed class RustAlarmComponent : IComponent
         _settings = new();
         _eventStack = new();
         _componentRenderer = new();
-        _heading = new("Rusty Segments", "-", _settings);
+        _heading = new(_settings);
         SetRun(state.Run);
         SetUpEventListeners();
     }

@@ -6,7 +6,7 @@ using LiveSplit.UI.Components;
 
 namespace LiveSplit.RustAlarm
 {
-    internal class RustAlarmHeading(string informationName, string informationValue, RustAlarmSettings settings) : InfoTextComponent(informationName, informationValue)
+    internal class RustAlarmHeading(RustAlarmSettings settings) : InfoTextComponent("Rusty Segments", TimeFormatConstants.DASH)
     {
         private readonly RustAlarmSettings _settings = settings;
         private int _rustCount;

@@ -219,9 +219,13 @@ namespace LiveSplit.RustAlarm
             {
                 return subsplitMatch.Groups["split"].Value;
             }
-            else
+            else if (Name.StartsWith("-"))
             {
                 return Name[1..];
+            }
+            else
+            {
+                return Name;
             }
         }
 
