@@ -17,9 +17,9 @@ Add the Rust Alarm component to your layout:
 
 ![image](https://github.com/user-attachments/assets/94536cfe-315e-4bad-a91f-8c4e8a9c0ab9)
 
-Rust Alarm can be used as-is, but I recommend reading the [settings guide](https://github.com/absent-friend/LiveSplit.RustAlarm/wiki/2.-Settings-Guide) to get the most out of it. Each segment can be configured separately to suit your needs as a runner.
+Rust Alarm can be used as-is, but I recommend reading the [settings guide](https://github.com/absent-friend/LiveSplit.RustAlarm/wiki/1.-Settings-Guide) to get the most out of it. Each segment can be configured separately to suit your needs as a runner.
 
-You should also be aware of these [warnings and caveats](https://github.com/absent-friend/LiveSplit.RustAlarm/wiki/3.-Warnings-and-Caveats).
+Once you're set up, you can read some [additional tips for using this component effectively](https://github.com/absent-friend/LiveSplit.RustAlarm/wiki/2.-Quick-Tips). You should also be aware of these [warnings and caveats](https://github.com/absent-friend/LiveSplit.RustAlarm/wiki/3.-Warnings-and-Caveats).
 
 If you have LiveSplit in your recording layout, you might not want to show Rust Alarm in the recording. I've written up some [recommendations for recording LiveSplit](https://github.com/absent-friend/LiveSplit.RustAlarm/wiki/4.-Excluding-Rust-Alarm-from-a-LiveSplit-Capture) with this in mind.
 
@@ -40,7 +40,7 @@ Building this component requires the .NET 9 SDK to be installed: `winget install
 
 ### IDE
 
-I don't have experience with Rider or any non-Visual Studio IDE. If you need to do something special to open this project in your IDE of choice, you're welcome to add instructions to this section of the readme and submit a pull request.
+I don't have experience with Rider or any non-Visual Studio IDE. If you need to do something special to open this project in your IDE of choice, you're welcome to add instructions to this section of the README and submit a pull request.
 
 If you want to use Visual Studio, you need to opt into a preview feature to open solutions in the .slnx format. Here are the steps:
 
