@@ -17,10 +17,11 @@ public sealed class RustAlarmComponent : IComponent
 {
     public const string Name = "Rust Alarm";
 
+    private readonly GraphicsCache _cache;
     private readonly LiveSplitState _state;
     private readonly RustAlarmSettings _settings;
     private readonly Stack<IRustAlarmEvent> _eventStack;
-    private readonly ComponentRendererComponent _componentRenderer;
+    private readonly ComponentRendererComponent _listRenderer;
     private readonly RustAlarmHeading _heading;
     private IRun _currentRun;
     private List<RustAlarmSegment> _segments;
@@ -29,10 +30,11 @@ public sealed class RustAlarmComponent : IComponent
 
     public RustAlarmComponent(LiveSplitState state)
     {
+        _cache = new();
         _state = state;
         _settings = new();
         _eventStack = new();
-        _componentRenderer = new();
+        _listRenderer = new();
         _heading = new(_settings);
         SetRun(state.Run);
         SetUpEventListeners();
@@ -40,21 +42,39 @@ public sealed class RustAlarmComponent : IComponent
 
     public string ComponentName => Name;
 
-    public float HorizontalWidth => _componentRenderer.HorizontalWidth;
+    public float HorizontalWidth => DisplayComponent.HorizontalWidth;
 
-    public float MinimumHeight => _componentRenderer.MinimumHeight;
+    public float MinimumHeight => DisplayComponent.MinimumHeight;
 
-    public float VerticalHeight => _componentRenderer.VerticalHeight;
+    public float VerticalHeight => DisplayComponent.VerticalHeight;
 
-    public float MinimumWidth => _componentRenderer.MinimumWidth;
+    public float MinimumWidth => DisplayComponent.MinimumWidth;
 
-    public float PaddingTop => _componentRenderer.PaddingTop;
+    public float PaddingTop => DisplayComponent.PaddingTop;
 
-    public float PaddingBottom => _componentRenderer.PaddingBottom;
+    public float PaddingBottom => DisplayComponent.PaddingBottom;
 
-    public float PaddingLeft => _componentRenderer.PaddingLeft;
+    public float PaddingLeft => DisplayComponent.PaddingLeft;
 
-    public float PaddingRight => _componentRenderer.PaddingRight;
+    public float PaddingRight => DisplayComponent.PaddingRight;
+
+    private IComponent DisplayComponent => SegmentIndex >= 0 ? _segments[SegmentIndex] : _listRenderer;
+
+    private int SegmentIndex
+    {
+        get => _segmentIndex;
+        set {
+            _segmentIndex = value;
+            if (value == -1)
+            {
+                DisplayRustySegmentList();
+            }
+            else
+            {
+                DisplayRustLevel(value);
+            }
+        }
+    }
 
     public void Update(IInvalidator invalidator, LiveSplitState state, float width, float height, LayoutMode mode)
     {
@@ -63,9 +83,16 @@ public sealed class RustAlarmComponent : IComponent
             SetRun(state.Run);
         }
 
+        _cache.Restart();
+        _cache["SegmentIndex"] = SegmentIndex;
+        if (invalidator != null && _cache.HasChanged)
+        {
+            invalidator.Invalidate(0, 0, width, height);
+        }
+
         if (invalidator != null)
         {
-            _componentRenderer.Update(invalidator, state, width, height, mode);
+            DisplayComponent.Update(invalidator, state, width, height, mode);
         }
     }
 
@@ -111,13 +138,13 @@ public sealed class RustAlarmComponent : IComponent
     public void DrawHorizontal(Graphics g, LiveSplitState state, float height, Region clipRegion)
     {
         DrawBackground(g, HorizontalWidth, height);
-        _componentRenderer.DrawHorizontal(g, state, height, clipRegion);
+        DisplayComponent.DrawHorizontal(g, state, height, clipRegion);
     }
 
     public void DrawVertical(Graphics g, LiveSplitState state, float width, Region clipRegion)
     {
         DrawBackground(g, width, VerticalHeight);
-        _componentRenderer.DrawVertical(g, state, width, clipRegion);
+        DisplayComponent.DrawVertical(g, state, width, clipRegion);
     }
 
     // Dispose is called when the component is removed from the layout or when the application is closed.
@@ -127,6 +154,7 @@ public sealed class RustAlarmComponent : IComponent
         _state.OnReset -= _state_OnReset;
         _state.OnSkipSplit -= _state_OnSkipSplit;
         _state.OnSplit -= _state_OnSplit;
+        _state.OnStart -= _state_OnStart;
         _state.OnUndoSplit -= _state_OnUndoSplit;
         _state.RunManuallyModified -= _state_RunManuallyModified;
     }
@@ -136,6 +164,7 @@ public sealed class RustAlarmComponent : IComponent
         _state.OnReset += _state_OnReset;
         _state.OnSkipSplit += _state_OnSkipSplit;
         _state.OnSplit += _state_OnSplit;
+        _state.OnStart += _state_OnStart;
         _state.OnUndoSplit += _state_OnUndoSplit;
         _state.RunManuallyModified += _state_RunManuallyModified;
     }
@@ -144,17 +173,17 @@ public sealed class RustAlarmComponent : IComponent
     {
         if (value != TimerPhase.Ended)
         {
-            bool newlyRusty = _segments[_segmentIndex].Reset();
+            bool newlyRusty = _segments[SegmentIndex].Reset();
             if (newlyRusty)
             {
                 _heading.RustCount++;
             }
         }
-        for (int i = 0; i <= _segmentIndex && i < _segments.Count; i++)
+        for (int i = 0; i <= SegmentIndex && i < _segments.Count; i++)
         {
             _segments[i].RunEnded();
         }
-        _segmentIndex = 0;
+        SegmentIndex = -1;
         _skipStart = 0;
         _eventStack.Clear();
     }
@@ -163,12 +192,12 @@ public sealed class RustAlarmComponent : IComponent
     {
         public void Apply()
         {
-            component._segmentIndex++;
+            component.SegmentIndex++;
         }
 
         public void Undo()
         {
-            component._segmentIndex--;
+            component.SegmentIndex--;
         }
     }
 
@@ -183,25 +212,25 @@ public sealed class RustAlarmComponent : IComponent
     {
         // It's assumed that both the previous split and the current one were not skipped. Don't call this in a situation that would violate those assumptions.
         TimeSpan? segment;
-        if (_segmentIndex == 0)
+        if (SegmentIndex == 0)
         {
-            segment = _currentRun[_segmentIndex].SplitTime[_state.CurrentTimingMethod];
+            segment = _currentRun[SegmentIndex].SplitTime[_state.CurrentTimingMethod];
         }
         else
         {
-            TimeSpan? split = _currentRun[_segmentIndex].SplitTime[_state.CurrentTimingMethod];
-            TimeSpan? previousSplit = _currentRun[_segmentIndex - 1].SplitTime[_state.CurrentTimingMethod];
+            TimeSpan? split = _currentRun[SegmentIndex].SplitTime[_state.CurrentTimingMethod];
+            TimeSpan? previousSplit = _currentRun[SegmentIndex - 1].SplitTime[_state.CurrentTimingMethod];
             segment = split - previousSplit;
         }
 
-        TimeSpan? bestSegment = _currentRun[_segmentIndex].BestSegmentTime[_state.CurrentTimingMethod];
+        TimeSpan? bestSegment = _currentRun[SegmentIndex].BestSegmentTime[_state.CurrentTimingMethod];
         return segment - bestSegment;
     }
 
     class SplitEvent(RustAlarmComponent component) : IRustAlarmEvent
     {
+        private readonly int _segmentIndex = component.SegmentIndex;
         private readonly int _skipStart = component._skipStart;
-        private readonly int _segmentIndex = component._segmentIndex;
         private readonly int _rustCount = component._heading.RustCount;
 
         public void Apply()
@@ -232,13 +261,13 @@ public sealed class RustAlarmComponent : IComponent
                 }
                 component._heading.RustCount -= noLongerRusty;
             }
-            component._segmentIndex++;
-            component._skipStart = component._segmentIndex;
+            component.SegmentIndex++;
+            component._skipStart = component.SegmentIndex;
         }
 
         public void Undo()
         {
-            component._segmentIndex = _segmentIndex;
+            component.SegmentIndex = _segmentIndex;
             component._skipStart = _skipStart;
             component._heading.RustCount = _rustCount;
 
@@ -254,6 +283,11 @@ public sealed class RustAlarmComponent : IComponent
         var split = new SplitEvent(this);
         split.Apply();
         _eventStack.Push(split);
+    }
+
+    private void _state_OnStart(object sender, EventArgs e)
+    {
+        SegmentIndex = 0;
     }
 
     private void _state_OnUndoSplit(object sender, EventArgs e)
@@ -323,7 +357,8 @@ public sealed class RustAlarmComponent : IComponent
         _segments = run
             .Select(_settings.GetOrCreateSegment)
             .ToList();
-        _componentRenderer.VisibleComponents = _segments
+        SegmentIndex = -1;
+        _listRenderer.VisibleComponents = _segments
             .Where(segment => segment.IsRusty())
             .Cast<IComponent>()
             .Prepend(_heading);
@@ -348,6 +383,19 @@ public sealed class RustAlarmComponent : IComponent
     private void RefreshRustCount()
     {
         _heading.RustCount = _segments.Where(segment => segment.IsRusty()).Count();
+    }
+
+    private void DisplayRustySegmentList()
+    {
+        foreach (RustAlarmSegment segment in _segments)
+        {
+            segment.LabelForList();
+        }
+    }
+
+    private void DisplayRustLevel(int index)
+    {
+        _segments[index].LabelForRun();
     }
 
     public IDictionary<string, Action> ContextMenuControls

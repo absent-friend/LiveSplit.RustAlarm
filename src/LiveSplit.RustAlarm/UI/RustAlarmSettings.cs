@@ -28,6 +28,8 @@ internal partial class RustAlarmSettings : UserControl
 
     public Color SegmentsColor { get; set; } = Color.White;
 
+    public Color CleanColor { get; set; } = Color.Green;
+
     public Color WarningColor { get; set; } = Color.Yellow;
 
     public Color DangerColor { get; set; } = Color.Red;
@@ -86,6 +88,7 @@ internal partial class RustAlarmSettings : UserControl
         chkSegmentsColor.DataBindings.Add(nameof(chkSegmentsColor.Checked), this, nameof(OverrideSegmentsColor), false, DataSourceUpdateMode.OnPropertyChanged);
         btnSegmentsColor.DataBindings.Add(nameof(btnSegmentsColor.BackColor), this, nameof(SegmentsColor), false, DataSourceUpdateMode.OnPropertyChanged);
         btnSegmentsColor.DataBindings.Add(nameof(btnSegmentsColor.Enabled), this, nameof(OverrideSegmentsColor), false, DataSourceUpdateMode.OnPropertyChanged);
+        btnCleanColor.DataBindings.Add(nameof(btnCleanColor.BackColor), this, nameof(CleanColor), false, DataSourceUpdateMode.OnPropertyChanged);
         btnWarningColor.DataBindings.Add(nameof(btnWarningColor.BackColor), this, nameof(WarningColor), false, DataSourceUpdateMode.OnPropertyChanged);
         btnDangerColor.DataBindings.Add(nameof(btnDangerColor.BackColor), this, nameof(DangerColor), false, DataSourceUpdateMode.OnPropertyChanged);
         chkTitleFont.DataBindings.Add(nameof(chkTitleFont.Checked), this, nameof(OverrideTitleFont), false, DataSourceUpdateMode.OnPropertyChanged);
@@ -137,6 +140,7 @@ internal partial class RustAlarmSettings : UserControl
                 ^ SettingsHelper.CreateSetting(document, parent, "SegmentsFont", SegmentsFont)
                 ^ SettingsHelper.CreateSetting(document, parent, "OverrideSegmentsColor", OverrideSegmentsColor)
                 ^ SettingsHelper.CreateSetting(document, parent, "SegmentsColor", SegmentsColor)
+                ^ SettingsHelper.CreateSetting(document, parent, "CleanColor", CleanColor)
                 ^ SettingsHelper.CreateSetting(document, parent, "WarningColor", WarningColor)
                 ^ SettingsHelper.CreateSetting(document, parent, "DangerColor", DangerColor)
                 ^ SettingsHelper.CreateSetting(document, parent, "OverrideTitleFont", OverrideTitleFont)
@@ -176,23 +180,24 @@ internal partial class RustAlarmSettings : UserControl
         if (settings is not XmlElement element)
             return;
 
-        OverrideSegmentsFont = SettingsHelper.ParseBool(element["OverrideSegmentsFont"]);
-        SegmentsFont = SettingsHelper.GetFontFromElement(element["SegmentsFont"]);
-        OverrideSegmentsColor = SettingsHelper.ParseBool(element["OverrideSegmentsColor"]);
-        SegmentsColor = SettingsHelper.ParseColor(element["SegmentsColor"]);
-        WarningColor = SettingsHelper.ParseColor(element["WarningColor"]);
-        DangerColor = SettingsHelper.ParseColor(element["DangerColor"]);
-        OverrideTitleFont = SettingsHelper.ParseBool(element["OverrideTitleFont"]);
-        TitleFont = SettingsHelper.GetFontFromElement(element["TitleFont"]);
-        OverrideTitleColor = SettingsHelper.ParseBool(element["OverrideTitleColor"]);
-        TitleColor = SettingsHelper.ParseColor(element["TitleColor"]);
-        OverrideCountFont = SettingsHelper.ParseBool(element["OverrideCountFont"]);
-        CountFont = SettingsHelper.GetFontFromElement(element["CountFont"]);
-        OverrideCountColor = SettingsHelper.ParseBool(element["OverrideCountColor"]);
-        CountColor = SettingsHelper.ParseColor(element["CountColor"]);
-        BackgroundColor1 = SettingsHelper.ParseColor(element["BackgroundColor1"]);
-        BackgroundColor2 = SettingsHelper.ParseColor(element["BackgroundColor2"]);
-        BackgroundGradient = SettingsHelper.ParseEnum<GradientType>(element["BackgroundGradient"]);
+        OverrideSegmentsFont = SettingsHelper.ParseBool(element["OverrideSegmentsFont"], OverrideSegmentsFont);
+        SegmentsFont = SettingsHelper.GetFontFromElement(element["SegmentsFont"]) ?? SegmentsFont;
+        OverrideSegmentsColor = SettingsHelper.ParseBool(element["OverrideSegmentsColor"], OverrideSegmentsColor);
+        SegmentsColor = SettingsHelper.ParseColor(element["SegmentsColor"], SegmentsColor);
+        CleanColor = SettingsHelper.ParseColor(element["CleanColor"], CleanColor);
+        WarningColor = SettingsHelper.ParseColor(element["WarningColor"], WarningColor);
+        DangerColor = SettingsHelper.ParseColor(element["DangerColor"], DangerColor);
+        OverrideTitleFont = SettingsHelper.ParseBool(element["OverrideTitleFont"], OverrideTitleFont);
+        TitleFont = SettingsHelper.GetFontFromElement(element["TitleFont"]) ?? TitleFont;
+        OverrideTitleColor = SettingsHelper.ParseBool(element["OverrideTitleColor"], OverrideTitleColor);
+        TitleColor = SettingsHelper.ParseColor(element["TitleColor"], TitleColor);
+        OverrideCountFont = SettingsHelper.ParseBool(element["OverrideCountFont"], OverrideCountFont);
+        CountFont = SettingsHelper.GetFontFromElement(element["CountFont"]) ?? CountFont;
+        OverrideCountColor = SettingsHelper.ParseBool(element["OverrideCountColor"], OverrideCountColor);
+        CountColor = SettingsHelper.ParseColor(element["CountColor"], CountColor);
+        BackgroundColor1 = SettingsHelper.ParseColor(element["BackgroundColor1"], BackgroundColor1);
+        BackgroundColor2 = SettingsHelper.ParseColor(element["BackgroundColor2"], BackgroundColor2);
+        BackgroundGradient = SettingsHelper.ParseEnum(element["BackgroundGradient"], BackgroundGradient);
 
         XmlNode run = element["Run"];
         while (run != null)
@@ -205,10 +210,10 @@ internal partial class RustAlarmSettings : UserControl
             {
                 int segmentKey = SettingsHelper.ParseInt(segment["Key"]);
                 RustAlarmSegment alarmSegment = GetOrCreateSegment(segmentKey, segmentCache);
-                alarmSegment.FailRateString = SettingsHelper.ParseString(segment["FailRate"]);
-                alarmSegment.WarningThreshold = SettingsHelper.ParseInt(segment["WarningThreshold"]);
-                alarmSegment.DangerThreshold = SettingsHelper.ParseInt(segment["DangerThreshold"]);
-                alarmSegment.MaxTimeLossString = SettingsHelper.ParseString(segment["MaxTimeLoss"]);
+                alarmSegment.FailRateString = SettingsHelper.ParseString(segment["FailRate"], alarmSegment.FailRateString);
+                alarmSegment.WarningThreshold = SettingsHelper.ParseInt(segment["WarningThreshold"], alarmSegment.WarningThreshold);
+                alarmSegment.DangerThreshold = SettingsHelper.ParseInt(segment["DangerThreshold"], alarmSegment.DangerThreshold);
+                alarmSegment.MaxTimeLossString = SettingsHelper.ParseString(segment["MaxTimeLoss"], alarmSegment.MaxTimeLossString);
 
                 segment = segment.NextSibling;
             }
