@@ -406,7 +406,7 @@ public sealed class RustAlarmComponent : IComponent
             contextControls["Clear All Rusty Segments"] = ClearRustySegments;
             foreach (RustAlarmSegment segment in _segments.Where(s => s.IsRusty()))
             {
-                contextControls["Clear Rust for " + segment.Name] = () => ClearRust(segment);
+                contextControls["Clear Rust for " + segment.DisplayName] = () => ClearRust(segment);
             }
             return contextControls;
         }
