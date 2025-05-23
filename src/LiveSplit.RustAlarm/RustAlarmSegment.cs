@@ -122,22 +122,26 @@ namespace LiveSplit.RustAlarm
                 }
                 else if (_failureStreak > WarningThreshold)
                 {
-                    return Interpolate(_settings.WarningColor, _settings.DangerColor);
+                    return Interpolate(_settings.WarningColor, WarningThreshold, _settings.DangerColor, DangerThreshold);
                 }
-                else if (_failureStreak ==  WarningThreshold)
+                else if (_failureStreak == WarningThreshold)
                 {
                     return _settings.WarningColor;
                 }
+                else if (_failureStreak > 0)
+                {
+                    return Interpolate(_settings.CleanColor, 0, _settings.WarningColor, WarningThreshold);
+                }
                 else
                 {
-                    return Color.Transparent;
+                    return _settings.CleanColor;
                 }
             }
         }
 
-        private Color Interpolate(Color start, Color end)
+        private Color Interpolate(Color start, int startThreshold, Color end, int endThreshold)
         {
-            decimal t = (_failureStreak - WarningThreshold) / (decimal)(DangerThreshold - WarningThreshold);
+            decimal t = (_failureStreak - startThreshold) / (decimal)(endThreshold - startThreshold);
             return Color.FromArgb(
                 (int)((1 - t) * start.A + t * end.A),
                 (int)((1 - t) * start.R + t * end.R),
@@ -212,6 +216,16 @@ namespace LiveSplit.RustAlarm
             return oldName;
         }
 
+        internal void LabelForRun()
+        {
+            _nameLabel.Text = "Rust Level";
+        }
+
+        internal void LabelForList()
+        {
+            _nameLabel.Text = CleanName();
+        }
+
         private string CleanName()
         {
             Match subsplitMatch = SUBSPLIT_REGEX.Match(Name);
@@ -284,6 +298,7 @@ namespace LiveSplit.RustAlarm
         public void Update(IInvalidator invalidator, LiveSplitState state, float width, float height, LayoutMode mode)
         {
             _cache.Restart();
+            _cache["NameLabel"] = _nameLabel.Text;
             _cache["RustColor"] = RustColor;
             if (invalidator != null && _cache.HasChanged)
             {
