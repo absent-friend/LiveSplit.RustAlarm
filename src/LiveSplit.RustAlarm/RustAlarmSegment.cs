@@ -159,23 +159,18 @@ namespace LiveSplit.RustAlarm
             MinimumHeight = 25;
         }
 
-        internal bool Reset()
+        internal void Reset()
         {
-            bool wasRusty = IsRusty();
             _failureStreak++;
-            bool isRusty = IsRusty();
-            return !wasRusty && isRusty;
         }
 
-        internal bool Split()
+        internal void Split()
         {
-            (bool wasRusty, bool isRusty) = Split(null);
-            return wasRusty && !isRusty;
+            Split(null);
         }
 
-        internal (bool, bool) Split(TimeSpan? delta)
+        internal void Split(TimeSpan? delta)
         {
-            bool wasRusty = IsRusty();
             if (delta != null && _maxTimeLoss != null && delta > _maxTimeLoss)
             {
                 _failureStreak++;
@@ -184,8 +179,6 @@ namespace LiveSplit.RustAlarm
             {
                 _failureStreak = 0;
             }
-            bool isRusty = IsRusty();
-            return (wasRusty, isRusty);
         }
 
         internal void Undo()

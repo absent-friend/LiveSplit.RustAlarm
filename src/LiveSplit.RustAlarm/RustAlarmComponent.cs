@@ -84,6 +84,7 @@ public sealed class RustAlarmComponent : IComponent
         }
 
         _cache.Restart();
+        _cache["RustCount"] = _heading.RustCount;
         _cache["SegmentIndex"] = SegmentIndex;
         if (invalidator != null && _cache.HasChanged)
         {
@@ -110,6 +111,8 @@ public sealed class RustAlarmComponent : IComponent
     public void SetSettings(XmlNode settings)
     {
         _settings.SetSettings(settings);
+        // Need this for when the user changes layout settings that affect the list and then cancels.
+        RefreshRustySegmentsList();
     }
 
     public Control GetSettingsControl(LayoutMode mode)
@@ -173,11 +176,7 @@ public sealed class RustAlarmComponent : IComponent
     {
         if (value != TimerPhase.Ended)
         {
-            bool newlyRusty = _segments[SegmentIndex].Reset();
-            if (newlyRusty)
-            {
-                _heading.RustCount++;
-            }
+            _segments[SegmentIndex].Reset();
         }
         for (int i = 0; i <= SegmentIndex; i++)
         {
@@ -186,6 +185,7 @@ public sealed class RustAlarmComponent : IComponent
         SegmentIndex = -1;
         _skipStart = 0;
         _eventStack.Clear();
+        RefreshRustySegmentsList();
     }
 
     class SkipEvent(RustAlarmComponent component) : IRustAlarmEvent
@@ -231,35 +231,20 @@ public sealed class RustAlarmComponent : IComponent
     {
         private readonly int _segmentIndex = component.SegmentIndex;
         private readonly int _skipStart = component._skipStart;
-        private readonly int _rustCount = component._heading.RustCount;
 
         public void Apply()
         {
             if (_skipStart == _segmentIndex)
             {
                 TimeSpan? deltaGold = component.TimeLostOrGainedToBest();
-                (bool wasRusty, bool isRusty) = component._segments[_segmentIndex].Split(deltaGold);
-                if (wasRusty && !isRusty)
-                {
-                    component._heading.RustCount--;
-                }
-                else if (!wasRusty && isRusty)
-                {
-                    component._heading.RustCount++;
-                }
+                component._segments[_segmentIndex].Split(deltaGold);
             }
             else
             {
-                int noLongerRusty = 0;
                 for (int i = _skipStart; i <= _segmentIndex; i++)
                 {
-                    bool newlyClean = component._segments[i].Split();
-                    if (newlyClean)
-                    {
-                        noLongerRusty++;
-                    }
+                    component._segments[i].Split();
                 }
-                component._heading.RustCount -= noLongerRusty;
             }
             component.SegmentIndex++;
             component._skipStart = component.SegmentIndex;
@@ -269,7 +254,6 @@ public sealed class RustAlarmComponent : IComponent
         {
             component.SegmentIndex = _segmentIndex;
             component._skipStart = _skipStart;
-            component._heading.RustCount = _rustCount;
 
             for (int i = _skipStart; i <= _segmentIndex; i++)
             {
@@ -346,7 +330,7 @@ public sealed class RustAlarmComponent : IComponent
             _segments.RemoveRange(i, _segments.Count - i);
         }
         SetUpSegmentListeners();
-        RefreshRustCount();
+        RefreshRustySegmentsList();
         _settings.RebuildSegmentsGrid();
     }
 
@@ -358,12 +342,8 @@ public sealed class RustAlarmComponent : IComponent
             .Select(_settings.GetOrCreateSegment)
             .ToList();
         SegmentIndex = -1;
-        _listRenderer.VisibleComponents = _segments
-            .Where(segment => segment.IsRusty())
-            .Cast<IComponent>()
-            .Prepend(_heading);
         SetUpSegmentListeners();
-        RefreshRustCount();
+        RefreshRustySegmentsList();
     }
 
     private void SetUpSegmentListeners()
@@ -377,12 +357,17 @@ public sealed class RustAlarmComponent : IComponent
 
     private void OnThresholdChange(object sender, EventArgs e)
     {
-        RefreshRustCount();
+        RefreshRustySegmentsList();
     }
 
-    private void RefreshRustCount()
+    private void RefreshRustySegmentsList()
     {
         _heading.RustCount = _segments.Where(segment => segment.IsRusty()).Count();
+        _listRenderer.VisibleComponents = _segments
+            .Where(segment => segment.IsRusty())
+            .Cast<IComponent>()
+            .Prepend(_heading)
+            .ToList();
     }
 
     private void DisplayRustySegmentList()
@@ -418,12 +403,12 @@ public sealed class RustAlarmComponent : IComponent
         {
             segment.ClearRust();
         }
-        _heading.RustCount = 0;
+        RefreshRustySegmentsList();
     }
 
     private void ClearRust(RustAlarmSegment segment)
     {
         segment.ClearRust();
-        _heading.RustCount--;
+        RefreshRustySegmentsList();
     }
 }
