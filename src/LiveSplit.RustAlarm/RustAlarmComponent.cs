@@ -62,14 +62,14 @@ public sealed class RustAlarmComponent : IComponent
 
     private int SegmentIndex
     {
-        get => _segmentIndex;
+        get => Math.Min(_segmentIndex, _segments.Count - 1);
         set {
             _segmentIndex = value;
             if (value == -1)
             {
                 DisplayRustySegmentList();
             }
-            else
+            else if (value < _segments.Count)
             {
                 DisplayRustLevel(value);
             }
@@ -179,7 +179,7 @@ public sealed class RustAlarmComponent : IComponent
                 _heading.RustCount++;
             }
         }
-        for (int i = 0; i <= SegmentIndex && i < _segments.Count; i++)
+        for (int i = 0; i <= SegmentIndex; i++)
         {
             _segments[i].RunEnded();
         }
