@@ -14,4 +14,15 @@
     </changelog>
   </update>
 
+  <update version="0.9.0">
+    <files>
+      <file path="/v0.9.0/LiveSplit.RustAlarm.dll" status="changed"/>
+    </files>
+	<changelog>
+	  <change>Now only shows the rust level of the current segment when a run is in progress.</change>
+	  <change>Fixed an issue where the proper segment name wasn't being displayed in the "Clear Rust for..." right-click actions.</change>
+	  <change>Fixed some obscure issues affecting the count of rusty segments, and improved performance thereof.</change>
+	</changelog>
+  </update>
+
 </updates>
