@@ -1,6 +1,12 @@
 # LiveSplit.RustAlarm
 ![livesplit-rustalarm-demo](https://github.com/user-attachments/assets/727696ee-bf7e-4eb1-83cc-f8bc17ac7bcc)
 
+## Disclaimer
+
+This component has a number of issues at a conceptual level, and [one major bug](https://github.com/absent-friend/LiveSplit.RustAlarm/issues/20). I don't recommend installing it at this time.
+
+-----------------------------------
+
 Rust Alarm is an informational component that warns you when a segment is likely getting rusty. When you have a bad split or a reset in a segment multiple times in a row, it will flag that segment in a special area of your LiveSplit window. You can use this as a signal to stop and practice, or just to focus harder on the next attempt.
 
 ## Downloads
